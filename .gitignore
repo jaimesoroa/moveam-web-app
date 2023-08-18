@@ -1,0 +1,6 @@
+raw_data/
+data/
+.env
+.env.yaml
+.envrc
+notebooks/

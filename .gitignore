@@ -1,6 +1,14 @@
-raw_data/
-data/
 .env
-.env.yaml
-.envrc
+
+# OS generated files #
+######################
+.DS_Store
+__MACOSX
+
+# Jupiter Notebook #
+####################
 notebooks/
+
+# Data #
+########
+data/

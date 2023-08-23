@@ -4,3 +4,9 @@ matplotlib
 seaborn
 streamlit
 watchdog
+streamlit-on-Hover-tabs
+datetime
+time
+requests
+os
+dotenv

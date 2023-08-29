@@ -4,16 +4,18 @@
 }
 */
 
+/* Replaced the previous with the following to remove the empty space between main screen and hoover menu */
+
 section[data-testid='stSidebar']{
 
-    background-color: #111;
+    background-color: #c4ede3;
     min-width:unset !important;
     max-width: unset !important; /*<--- This part is optional.*/
     width: unset !important;
     flex-shrink: unset !important; /*<--- This part is optional.*/
-    
 }
 
+/* Not sure what the next one does, I have commented it to check and nothing changes */
 /*
 button[kind="header"] {
     background-color: transparent;
@@ -24,8 +26,8 @@ button[kind="header"] {
 @media(hover){
     /* header element to be removed */
     header[data-testid="stHeader"] {
-        display:none;
-    }
+        display:outside;
+    } /* change "outside" to "none" to remove the upper-right Streamlit menu /*
 
     /* The navigation menu specs and size */
     section[data-testid='stSidebar'] > div {
@@ -35,7 +37,7 @@ button[kind="header"] {
         z-index: 1;
         top: 0;
         left: 0;
-        background-color: #111;
+        background-color: #c4ede3;
         overflow-x: hidden;
         transition: 0.3s ease;
         padding-top: 60px;
@@ -61,10 +63,28 @@ button[kind="header"] {
     }
 }
      
+/*
 @media(max-width: 272px){
     
     section[data-testid='stSidebar'] > div {
         width:15rem;
     }
 }
- 
+*/
+
+/* Replacem Streamlit footer with another one */
+
+footer {
+	
+	visibility: hidden;
+	
+	}
+footer:after {
+	content:'Copyright © 2023 Moveam Todos los derechos reservados ©';
+	visibility: visible;
+	display: block;
+	position: relative;
+	background-color: rgb(255, 255, 255);
+	padding: 5px;
+	top: 2px;
+}

@@ -35,46 +35,21 @@ st.sidebar.image('moveam_app/images/Moveam_Transp.png')
 st.sidebar.write("___")
 
 with st.sidebar:
-        tabs = on_hover_tabs(tabName=['Propiedades', 'Consumos', 'Vehículos', 'Áreas comunes', 'Informes'], 
-                             iconName=['🏠', '📈', '🅿️', '📹', '📋'],
-                             default_choice= 1,
+        tabs = on_hover_tabs(tabName=['Consumos', 'Vehículos', 'Zonas comunes', 'Informes'], 
+                             iconName=['📈', '🅿️', '📹', '📋'],
+                             default_choice= 0,
+                             styles= {'navtab': {'background-color':'#c4ede3',
+                                                  'color': '#818181',
+                                                  'font-size': '15px',
+                                                  'transition': '.3s',
+                                                  'white-space': 'nowrap',
+                                                  'text-transform': 'None'}},
                              key="0")
-
-# ===============================================================================================================
-# Tab Propiedades
-if tabs =='Propiedades':
-    
-    c1, c2,  = st.columns([15, 1.5], gap='medium')
-    with c1:
-        st.title("Propiedades")
-    with c2:
-        st.image('moveam_app/images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
-        
-    st.markdown("""---""")
-    
-    tab_prop_1, tab_prop_2, tab_prop_3 = st.tabs(["Tarragona", "Prop_2", "Prop_3"])
-    
-    with tab_prop_1:
-        st.markdown("Información de la propiedad, con algo gráfico que lo haga atractivo")
-        st.markdown("Se pueden integrar mapas fácilmente")
-        map_data = pd.DataFrame(
-        np.random.randn(150, 2) / [50, 50] + [41.12, 1.24],
-        columns=['lat', 'lon'])
-
-        st.map(map_data)
-        st.markdown("""---""")
-        
-    with tab_prop_2:
-        st.markdown("Información")
-    
-    with tab_prop_3:
-        st.markdown("Información")
-        
         
 # ===============================================================================================================
 # Tab Consumos
 
-elif tabs == 'Consumos':
+if tabs == 'Consumos':
     c1, c2,  = st.columns([15, 1.5], gap='medium')
     with c1:
         st.title("Consumos")
@@ -82,11 +57,15 @@ elif tabs == 'Consumos':
         st.image('moveam_app/images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
     st.markdown("""---""")
     
+    @st.cache_resource
+    def plot_power_bi_1():
+        return st.markdown(f'<iframe title= {POWER_BI_TITLE_1} width="1140" height="541.25" src={POWER_BI_SRC_1} frameborder="0" allowFullScreen="true"></iframe>', unsafe_allow_html=True)
+    
     tab_cons_1, tab_cons_2 = st.tabs(["General", "Detalle"])
     
     with tab_cons_1:
         st.markdown("Integración de Dashboard de Power BI")
-        st.markdown(f'<iframe title= {POWER_BI_TITLE_1} width="1140" height="541.25" src={POWER_BI_SRC_1} frameborder="0" allowFullScreen="true"></iframe>', unsafe_allow_html=True)
+        plot_power_bi_1()
         st.markdown("""---""")
         
     with tab_cons_2:
@@ -112,3 +91,31 @@ elif tabs == 'Vehículos':
     with c2:
         st.image('moveam_app/images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
     st.markdown("""---""")
+    
+    st.markdown("Gestión de vehículos, hay que darle una vuelta para mejorar lo que hay en la aplicación")
+
+# ===============================================================================================================
+# Tab Zonas Comunes
+
+elif tabs == 'Zonas comunes':
+    c1, c2,  = st.columns([15, 1.5], gap='medium')
+    with c1:
+        st.title("Zonas comunes")
+    with c2:
+        st.image('moveam_app/images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+    st.markdown("""---""")
+    
+    st.markdown("Aquí añadiríamos estadísticas de las zonas comunes")
+    
+# ===============================================================================================================
+# Tab Informes
+
+elif tabs == 'Informes':
+    c1, c2,  = st.columns([15, 1.5], gap='medium')
+    with c1:
+        st.title("Informes")
+    with c2:
+        st.image('moveam_app/images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+    st.markdown("""---""")
+    
+    st.markdown("Herramientas de generación de informes")

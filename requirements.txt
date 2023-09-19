@@ -10,3 +10,6 @@ streamlit-on-Hover-tabs
 # requests
 # os
 python-dotenv
+streamlit-authenticator
+yaml
+st_pages

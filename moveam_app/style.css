@@ -50,7 +50,7 @@ button[kind="header"] {
     width: 75px; /* Put some width to hover on. */
     /* } 
 
-    /* ON HOVER */
+    /* ON HOVER Defines hot the side bar hovers*/ 
     section[data-testid='stSidebar'] > div:hover{
     width: 300px;
     transition: 0.3s ergb(29, 10, 10);

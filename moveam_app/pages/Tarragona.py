@@ -8,14 +8,11 @@ import time as t
 import os
 import dotenv
 from dotenv import load_dotenv
-
-load_dotenv()
-
-dirname = os.path.dirname(__file__)
-
-POWER_BI_TITLE_1 = os.environ.get("POWER_BI_TITLE_1")
-POWER_BI_SRC_1 = os.environ.get("POWER_BI_SRC_1")
-
+import streamlit_authenticator as stauth
+import yaml
+from yaml.loader import SafeLoader
+from st_pages import Page, Section, show_pages, add_page_title
+from Home import username
 
 # ===============================================================================================================
 # Page config            
@@ -29,6 +26,17 @@ st.set_page_config(
 if "params" not in st.session_state:
     st.session_state['params'] = dict()
     
+load_dotenv()
+
+dirname = os.path.dirname(__file__)
+
+POWER_BI_TITLE_1 = os.environ.get("POWER_BI_TITLE_1")
+POWER_BI_SRC_1 = os.environ.get("POWER_BI_SRC_1")
+
+    
+# ===============================================================================================================
+# Beginning of page
+
 st.markdown('<style>' + open('moveam_app/style.css').read() + '</style>', unsafe_allow_html=True)
 
 st.sidebar.image('moveam_app/images/Moveam_Transp.png')

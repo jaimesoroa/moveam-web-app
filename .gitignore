@@ -1,5 +1,7 @@
 .env
 .python-version
+.yaml
+config.yaml
 
 # OS generated files #
 ######################

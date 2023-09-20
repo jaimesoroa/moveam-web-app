@@ -13,3 +13,4 @@ python-dotenv
 streamlit-authenticator
 yaml
 st_pages
+streamlit_extras

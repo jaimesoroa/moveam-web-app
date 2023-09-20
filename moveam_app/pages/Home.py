@@ -36,40 +36,24 @@ if "params" not in st.session_state:
     st.session_state['params'] = dict()
 
 
-# ===============================================================================================================
-# Authentication
 
-# Import the YAML file with the users information
-with open('config.yaml') as file:
-    config = yaml.load(file, Loader=SafeLoader)
+if not st.session_state["authentication_status"]:
+    st.write('Please login')
+    show_pages(
+        [
+            Page("moveam_app/login.py", "Login", "🏠"),
+            Page("moveam_app/pages/Home.py", "Home", "🏠")
+        ]
+        )
 
-# Create the authenticator object
-authenticator = stauth.Authenticate(
-    config['credentials'],
-    config['cookie']['name'],
-    config['cookie']['key'],
-    config['cookie']['expiry_days'],
-    config['preauthorized']
-)
-
-# Render the login widget by providing a name for the form and its location (i.e., sidebar or main)
-name, authentication_status, username = authenticator.login('Login', 'main')
-
-# use the return values to read the name, authentication_status, and username of the authenticated user.
-# ppt-in can be done for a logout button and add it as follows
-if authentication_status:
+else:
     
-    st.write(f'Welcome *{name}*')
-    
-# Rest of instructions below to be copied at the end
+    st.write(f'Welcome *{st.session_state["name"]}*')
+    st.session_state['authenticator'].logout('Logout', 'sidebar')
 
-# elif authentication_status == False:
-#     st.error('Username/password is incorrect')
-# elif authentication_status == None:
-#     st.warning('Please enter your username and password')
 
 ###########################################################
-# Another way of doing the same:
+# Another way of doing the authentication:
 
 # if st.session_state["authentication_status"]:
 #     authenticator.logout('Logout', 'main')
@@ -86,7 +70,6 @@ if authentication_status:
 # Given that the authenticator object returns the username of your logged-in user, you can utilize that 
 # to implement user privileges where each user receives a more personalized experience as shown below:
 
-# name, authentication_status, username = authenticator.login('Login', 'main')
 # if authentication_status:
 #     authenticator.logout('Logout', 'main')
 #     if username == 'jsmith':
@@ -109,7 +92,9 @@ if authentication_status:
 
     # Specify what pages should be shown in the sidebar, and what their titles 
     # and icons should be
-    if username == 'jsoroa':
+    
+    home_authorized_users = ['jsoroa', 'fperez', 'jfuster']
+    if st.session_state['username'] in home_authorized_users:
 #         st.write(f'Welcome *{name}*')
 #         st.title('Application 1')
 #     elif username == 'rbriggs':
@@ -118,15 +103,16 @@ if authentication_status:
 
         show_pages(
         [
-            Page("moveam_app/Home.py", "Home", "🏠"),
+            Page("moveam_app/login.py", "Login", "🏠"),
+            Page("moveam_app/pages/Home.py", "Home", "🏠"),
             Section(name= "Cool section", icon=":pig:"),
-                Page("moveam_app/pages/Tarragona.py", "Tarragona", ":books:")
+            Page("moveam_app/pages/Tarragona.py", "Tarragona", ":books:")
         ]
         )
     else:
         show_pages(
         [
-            Page("moveam_app/Home.py", "Home", "🏠"),
+            Page("moveam_app/pages/Home.py", "Home", "🏠"),
             Page("moveam_app/pages/Tarragona.py", "Tarragona", ":books:")
         ]
         )
@@ -222,9 +208,6 @@ if authentication_status:
             st.image('moveam_app/images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
         st.markdown("""---""")
         
-    authenticator.logout('Logout', 'sidebar')
+
     
-elif authentication_status == False:
-    st.error('Username/password is incorrect')
-elif authentication_status == None:
-    st.warning('Please enter your username and password')
+    

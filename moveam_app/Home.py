@@ -12,6 +12,7 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 from st_pages import Page, Section, show_pages, add_page_title
+from streamlit_extras.switch_page_button import switch_page
 
 # ===============================================================================================================
 # Page config
@@ -35,100 +36,51 @@ st.set_page_config(
 if "params" not in st.session_state:
     st.session_state['params'] = dict()
 
+# ===============================================================================================================
+# Authentication
+
+# Import the YAML file with the users information
+with open('config.yaml') as file:
+    config = yaml.load(file, Loader=SafeLoader)
+
+# Create the authenticator object
+authenticator = stauth.Authenticate(
+    config['credentials'],
+    config['cookie']['name'],
+    config['cookie']['key'],
+    config['cookie']['expiry_days'],
+    config['preauthorized']
+)
+
+st.session_state['authenticator'] = authenticator
+
+# Render the login widget by providing a name for the form and its location (i.e., sidebar or main)
+name, authentication_status, username = authenticator.login('Login', 'main')
 
 
-if not st.session_state["authentication_status"]:
-    st.write('Please login')
+# use the return values to read the name, authentication_status, and username of the authenticated user.
+# ppt-in can be done for a logout button and add it as follows
+if authentication_status:
+    st.write(f'Welcome to Moveam, *{name}*')
+    
+    # It's possible to swithc automatically to another page:
+    # switch_page("Home")
+    
+    # Logout button
+    authenticator.logout('Logout', 'main')
+    
+    # Pages to be shown when looged in
+    # Specify what pages should be shown in the sidebar, and what their titles and icons should be
     show_pages(
         [
-            Page("moveam_app/login.py", "Login", "🏠"),
-            Page("moveam_app/pages/Home.py", "Home", "🏠")
+            Page("moveam_app/Home.py", "Home", ":computer:"),
+            Page("moveam_app/pages/Tarragona.py", "Tarragona", "🏠"),
+            Page("moveam_app/pages/Almeria.py", "Almeria", "🏠")
         ]
         )
-
-else:
     
-    st.write(f'Welcome *{st.session_state["name"]}*')
-    st.session_state['authenticator'].logout('Logout', 'sidebar')
-
-
-###########################################################
-# Another way of doing the authentication:
-
-# if st.session_state["authentication_status"]:
-#     authenticator.logout('Logout', 'main')
-#     st.write(f'Welcome *{st.session_state["name"]}*')
-#     st.title('Some content')
-# elif st.session_state["authentication_status"] == False:
-#     st.error('Username/password is incorrect')
-# elif st.session_state["authentication_status"] == None:
-#     st.warning('Please enter your username and password')
-###########################################################
-
-
-# How to implement user privileges
-# Given that the authenticator object returns the username of your logged-in user, you can utilize that 
-# to implement user privileges where each user receives a more personalized experience as shown below:
-
-# if authentication_status:
-#     authenticator.logout('Logout', 'main')
-#     if username == 'jsmith':
-#         st.write(f'Welcome *{name}*')
-#         st.title('Application 1')
-#     elif username == 'rbriggs':
-#         st.write(f'Welcome *{name}*')
-#         st.title('Application 2')
-# elif authentication_status == False:
-#     st.error('Username/password is incorrect')
-# elif authentication_status == None:
-#     st.warning('Please enter your username and password')
-
-
-# ===============================================================================================================
-# Beginning of page
-
-    # Optional -- adds the title and icon to the current page
-    # add_page_title("Homeeeeeemmm")
-
-    # Specify what pages should be shown in the sidebar, and what their titles 
-    # and icons should be
-    
-    home_authorized_users = ['jsoroa', 'fperez', 'jfuster']
-    if st.session_state['username'] in home_authorized_users:
-#         st.write(f'Welcome *{name}*')
-#         st.title('Application 1')
-#     elif username == 'rbriggs':
-#         st.write(f'Welcome *{name}*')
-#         st.title('Application 2')
-
-        show_pages(
-        [
-            Page("moveam_app/login.py", "Login", "🏠"),
-            Page("moveam_app/pages/Home.py", "Home", "🏠"),
-            Section(name= "Cool section", icon=":pig:"),
-            Page("moveam_app/pages/Tarragona.py", "Tarragona", ":books:")
-        ]
-        )
-    else:
-        show_pages(
-        [
-            Page("moveam_app/pages/Home.py", "Home", "🏠"),
-            Page("moveam_app/pages/Tarragona.py", "Tarragona", ":books:")
-        ]
-        )
-
     # ===============================================================================================================
-    # System variables
-
-    load_dotenv()
-
-    dirname = os.path.dirname(__file__)
-
-    POWER_BI_TITLE_1 = os.environ.get("POWER_BI_TITLE_1")
-    POWER_BI_SRC_1 = os.environ.get("POWER_BI_SRC_1")
-
-    # ===============================================================================================================
-    # Page
+    # Beginning of page
 
     st.markdown('<style>' + open('moveam_app/style.css').read() + '</style>', unsafe_allow_html=True)
 
@@ -137,8 +89,8 @@ else:
     # st.sidebar.write("___")
 
     with st.sidebar:
-            tabs = on_hover_tabs(tabName=['Propiedades', 'Otros'], 
-                                 iconName=['🏠', '🗝️'],
+            tabs = on_hover_tabs(tabName=['Propiedades', 'Sobre Moveam'], 
+                                 iconName=['🏠', 'information'],
                                  default_choice= 0,
                                  styles= {'navtab': {'background-color':'#c4ede3',
                                                       'color': '#818181',
@@ -179,7 +131,7 @@ else:
 
         st.markdown("""---""")
 
-        tab_prop_1, tab_prop_2, tab_prop_3 = st.tabs(["Tarragona", "Prop_2", "Prop_3"])
+        tab_prop_1, tab_prop_2, tab_prop_3 = st.tabs(["Tarragona", "Almería", "Torrejón"])
 
         with tab_prop_1:
             st.markdown("Información de la propiedad, con algo gráfico que lo haga atractivo")
@@ -200,14 +152,50 @@ else:
     # ===============================================================================================================
     # Tab Otros
 
-    elif tabs == 'Otros':
+    elif tabs == 'Sobre Moveam':
         c1, c2,  = st.columns([15, 1.5], gap='medium')
         with c1:
-            st.title("Otros")
+            st.title("Sobre Moveam")
         with c2:
             st.image('moveam_app/images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
         st.markdown("""---""")
         
+    
+# Rest of instructions below to be copied at the end
 
+# elif authentication_status == False:
+#     st.error('Username/password is incorrect')
+# elif authentication_status == None:
+#     st.warning('Please enter your username and password')
+
+###########################################################
+# Another way of doing the same:
+
+# if st.session_state["authentication_status"]:
+#     authenticator.logout('Logout', 'main')
+#     st.write(f'Welcome *{st.session_state["name"]}*')
+#     st.title('Some content')
+# elif st.session_state["authentication_status"] == False:
+#     st.error('Username/password is incorrect')
+# elif st.session_state["authentication_status"] == None:
+#     st.warning('Please enter your username and password')
+###########################################################
+
+elif authentication_status == False:
+    st.error('Username/password is incorrect')
     
+    # Pages to be shown when not logged in
+    show_pages(
+        [
+            Page("moveam_app/Home.py", "Login", ":computer:")
+        ]
+        )
+elif authentication_status == None:
+    st.warning('Please enter your username and password')
     
+    # Pages to be shown when not logged in
+    show_pages(
+        [
+            Page("moveam_app/Home.py", "Login", ":computer:")
+        ]
+        )

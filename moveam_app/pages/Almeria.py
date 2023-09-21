@@ -14,12 +14,13 @@ from yaml.loader import SafeLoader
 from st_pages import Page, Section, show_pages, add_page_title
 
 # ===============================================================================================================
-# Page config            
+# Page config
+         
 st.set_page_config(
     page_title="Moveam",
     page_icon='moveam_app/images/Moveam_Transp.png',
     layout="wide",
-    initial_sidebar_state="auto",
+    initial_sidebar_state="auto"
 )
 #########################################################################
 # it's possible to add menu iteams (upper right hand menu) inside set_page_config
@@ -33,7 +34,7 @@ st.set_page_config(
 
 if "params" not in st.session_state:
     st.session_state['params'] = dict()
-    
+
 # ===============================================================================================================
 # Authentication
 
@@ -46,53 +47,20 @@ if not st.session_state["authentication_status"]:
         )
 
 else:
-    
     show_pages(
         [
             Page("moveam_app/Home.py", "Home", ":computer:"),
             Page("moveam_app/pages/Tarragona.py", "Tarragona", "🏠"),
-            Page("moveam_app/pages/Almeria.py", "Almeria", ":books:")
+            Page("moveam_app/pages/Almeria.py", "Almeria", "🏠")
             
         ]
         )
-    
-    ###########################################################
-    # Another way of doing the authentication:
 
-    # if st.session_state["authentication_status"]:
-    #     authenticator.logout('Logout', 'main')
-    #     st.write(f'Welcome *{st.session_state["name"]}*')
-    #     st.title('Some content')
-    # elif st.session_state["authentication_status"] == False:
-    #     st.error('Username/password is incorrect')
-    # elif st.session_state["authentication_status"] == None:
-    #     st.warning('Please enter your username and password')
-    ###########################################################
-
-
-    # How to implement user privileges
-    # Given that the authenticator object returns the username of your logged-in user, you can utilize that 
-    # to implement user privileges where each user receives a more personalized experience as shown below:
-
-    # if authentication_status:
-    #     authenticator.logout('Logout', 'main')
-    #     if username == 'jsmith':
-    #         st.write(f'Welcome *{name}*')
-    #         st.title('Application 1')
-    #     elif username == 'rbriggs':
-    #         st.write(f'Welcome *{name}*')
-    #         st.title('Application 2')
-    # elif authentication_status == False:
-    #     st.error('Username/password is incorrect')
-    # elif authentication_status == None:
-    #     st.warning('Please enter your username and password')
-
-
-# ===============================================================================================================
+    # ===============================================================================================================
     # User authorization
     
-    tarragona_authorized_users = ['jsoroa', 'fperez']
-    if st.session_state['username'] in tarragona_authorized_users:
+    almeria_authorized_users = ['jsoroa']
+    if st.session_state['username'] in almeria_authorized_users:
         st.write(f'Welcome to Moveam, *{st.session_state["name"]}*')
 
         show_pages(
@@ -102,17 +70,17 @@ else:
             Page("moveam_app/pages/Almeria.py", "Almeria", ":books:")
         ]
         )
-
+        
         # ===============================================================================================================
         # System variables
 
+        # To be used if necessary for another Power BI dashboard
         load_dotenv()
 
         dirname = os.path.dirname(__file__)
 
         POWER_BI_TITLE_1 = os.environ.get("POWER_BI_TITLE_1")
         POWER_BI_SRC_1 = os.environ.get("POWER_BI_SRC_1")
-
 
         # ===============================================================================================================
         # Beginning of page
@@ -131,7 +99,7 @@ else:
                                                           'white-space': 'nowrap',
                                                           'text-transform': 'None'}},
                                      key="0")
-
+                
         # ===============================================================================================================
         # Tab Consumos
 
@@ -205,8 +173,9 @@ else:
             st.markdown("""---""")
 
             st.markdown("Herramientas de generación de informes")
-            
+
     else:
+        st.write('You are not authorized to see this property')
         show_pages(
         [
             Page("moveam_app/Home.py", "Home", "🏠"),
@@ -215,12 +184,11 @@ else:
         ]
         )
         
-        st.write('You are not authorized to see this property')
         st.markdown('<style>' + open('moveam_app/style.css').read() + '</style>', unsafe_allow_html=True)
         
         with st.sidebar:
-                tabs = on_hover_tabs(tabName=['Home'], 
-                                     iconName=['🏠'],
+                tabs = on_hover_tabs(tabName=[''], 
+                                     iconName=[''],
                                      default_choice= 0,
                                      styles= {'navtab': {'background-color':'#c4ede3',
                                                           'color': '#818181',

@@ -75,7 +75,8 @@ if authentication_status:
         [
             Page("moveam_app/Home.py", "Home", ":computer:"),
             Page("moveam_app/pages/Tarragona.py", "Tarragona", "🏠"),
-            Page("moveam_app/pages/Almeria.py", "Almeria", "🏠")
+            Page("moveam_app/pages/Almeria.py", "Almería", "🏠"),
+            Page("moveam_app/pages/Torrejon.py", "Torrejón", "🏠")
         ]
         )
     
@@ -135,6 +136,9 @@ if authentication_status:
 
         with tab_prop_1:
             st.markdown("Información de la propiedad, con algo gráfico que lo haga atractivo")
+            tarragona_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'tarragona_analitica')
+            if tarragona_analitica:
+                switch_page('Tarragona')
             st.markdown("Se pueden integrar mapas por ejemplo")
             map_data = pd.DataFrame(
             np.random.randn(150, 2) / [50, 50] + [41.12, 1.24],
@@ -145,9 +149,15 @@ if authentication_status:
 
         with tab_prop_2:
             st.markdown("Información")
+            almeria_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'almeria_analitica')
+            if almeria_analitica:
+                switch_page('Almería')
 
         with tab_prop_3:
             st.markdown("Información")
+            torrejon_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'torrejon_analitica')
+            if torrejon_analitica:
+                switch_page('Torrejón')
     
     # ===============================================================================================================
     # Tab Otros
@@ -156,9 +166,9 @@ if authentication_status:
         c1, c2,  = st.columns([15, 1.5], gap='medium')
         with c1:
             st.title("Sobre Moveam")
+            st.write("Conócenos en [link](https://moveam.com/)")
         with c2:
             st.image('moveam_app/images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
-        st.markdown("""---""")
         
     
 # Rest of instructions below to be copied at the end

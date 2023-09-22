@@ -47,14 +47,14 @@ if not st.session_state["authentication_status"]:
 
 else:
     
-    show_pages(
-        [
-            Page("moveam_app/Home.py", "Home", ":computer:"),
-            Page("moveam_app/pages/Tarragona.py", "Tarragona", "🏠"),
-            Page("moveam_app/pages/Almeria.py", "Almeria", ":books:")
-            
-        ]
-        )
+    # show_pages(
+    #     [
+    #         Page("moveam_app/Home.py", "Home", ":computer:"),
+    #         Page("moveam_app/pages/Tarragona.py", "Tarragona", "🏠"),
+    #         Page("moveam_app/pages/Almeria.py", "Almería", "🏠"),
+    #         Page("moveam_app/pages/Torrejon.py", "Torrejón", "🏠")            
+    #     ]
+    #     )
     
     ###########################################################
     # Another way of doing the authentication:
@@ -97,9 +97,10 @@ else:
 
         show_pages(
         [
-            Page("moveam_app/Home.py", "Home", "🏠"),
+            Page("moveam_app/Home.py", "Home", ":computer:"),
             Page("moveam_app/pages/Tarragona.py", "Tarragona", "🏠"),
-            Page("moveam_app/pages/Almeria.py", "Almeria", ":books:")
+            Page("moveam_app/pages/Almeria.py", "Almería", "🏠"),
+            Page("moveam_app/pages/Torrejon.py", "Torrejón", "🏠")
         ]
         )
 
@@ -209,9 +210,10 @@ else:
     else:
         show_pages(
         [
-            Page("moveam_app/Home.py", "Home", "🏠"),
+            Page("moveam_app/Home.py", "Home", ":computer:"),
             Page("moveam_app/pages/Tarragona.py", "Tarragona", "🏠"),
-            Page("moveam_app/pages/Almeria.py", "Almeria", ":books:")
+            Page("moveam_app/pages/Almeria.py", "Almería", "🏠"),
+            Page("moveam_app/pages/Torrejon.py", "Torrejón", "🏠")
         ]
         )
         

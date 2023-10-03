@@ -5,13 +5,20 @@ seaborn
 streamlit
 watchdog
 streamlit-on-Hover-tabs
-# datetime
+datetime
 # time
 # requests
-# os
+os
 python-dotenv
 streamlit-authenticator
-yaml
+pyyaml
 st_pages
 streamlit_extras
-azure-identity
+# azure-identity
+mysql.connector
+sqlalchemy
+# path
+# msal_streamlit_authentication
+# selenium
+boto3
+path

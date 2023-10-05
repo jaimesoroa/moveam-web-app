@@ -1,12 +1,11 @@
 FROM python:3.10-bullseye
-# WORKDIR /moveam_app
-COPY moveam_app moveam_app
+WORKDIR /usr/src/app
 COPY pages pages
 COPY images images
 COPY Home.py Home.py
-COPY database.py database.py
 COPY style.css style.css
 COPY .env .env
+COPY config.yaml config.yaml
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 EXPOSE 8501

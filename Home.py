@@ -56,7 +56,7 @@ parent_dir = os.path.dirname(os.path.realpath(__file__))
 # Add the parent directory to sys.path
 sys.path.append(parent_dir)
 
-# System variables from .3nv instead of from AWS secrets
+# # System variables from .env instead of from AWS secrets
 load_dotenv()
 
 SQL_DB_TARRAGONA_USER = os.environ.get("SQL_DB_TARRAGONA_USER")
@@ -72,7 +72,7 @@ SQL_DB_TARRAGONA_DB = os.environ.get("SQL_DB_TARRAGONA_DB")
 
 # ===============================================================================================================
 # AWS secrets
-# Temporary commented until I manage to get it work in an instance
+# Temporary commented to avoid issues with AWS keys
 
 # @st.cache_resource
 # def get_secret_tarragona_db():
@@ -112,27 +112,26 @@ SQL_DB_TARRAGONA_DB = os.environ.get("SQL_DB_TARRAGONA_DB")
 # ===============================================================================================================
 # Database connections
 
-# Connect to database
-# @st.cache_resource
-# def database_connection(SQL_DB_TARRAGONA_USER, SQL_DB_TARRAGONA_PWD, SQL_DB_TARRAGONA_SERVER, SQL_DB_TARRAGONA_DB):
-#     url_db_tarragona = db.URL.create(
-#         "mysql+mysqldb",
-#         username = SQL_DB_TARRAGONA_USER,
-#         password = SQL_DB_TARRAGONA_PWD,
-#         host = SQL_DB_TARRAGONA_SERVER,
-#         database = SQL_DB_TARRAGONA_DB,
-#     )
+@st.cache_resource
+def database_connection(SQL_DB_TARRAGONA_USER, SQL_DB_TARRAGONA_PWD, SQL_DB_TARRAGONA_SERVER, SQL_DB_TARRAGONA_DB):
+    url_db_tarragona = db.URL.create(
+        "mysql+mysqldb",
+        username = SQL_DB_TARRAGONA_USER,
+        password = SQL_DB_TARRAGONA_PWD,
+        host = SQL_DB_TARRAGONA_SERVER,
+        database = SQL_DB_TARRAGONA_DB,
+    )
 
-#     tarragona_db_engine = db.create_engine(url_db_tarragona)
+    tarragona_db_engine = db.create_engine(url_db_tarragona)
 
-#     with tarragona_db_engine.connect() as conn, conn.begin():
-#         data_tarragona = pd.read_sql_table("kWh", conn)
+    with tarragona_db_engine.connect() as conn, conn.begin():
+        data_tarragona = pd.read_sql_table("kWh", conn)
     
-#     return data_tarragona
+    return data_tarragona
 
-# data_tarragona = database_connection(SQL_DB_TARRAGONA_USER, SQL_DB_TARRAGONA_PWD, SQL_DB_TARRAGONA_SERVER, SQL_DB_TARRAGONA_DB)
+data_tarragona = database_connection(SQL_DB_TARRAGONA_USER, SQL_DB_TARRAGONA_PWD, SQL_DB_TARRAGONA_SERVER, SQL_DB_TARRAGONA_DB)
 
-# st.session_state['data_tarragona'] = data_tarragona
+st.session_state['data_tarragona'] = data_tarragona
 
 
 # Some more examples of database queries
@@ -158,20 +157,29 @@ SQL_DB_TARRAGONA_DB = os.environ.get("SQL_DB_TARRAGONA_DB")
 # data_tarragona['Date_Hour'] = pd.to_datetime(data_tarragona['Date_Hour'])
 
 # Create a specific series for the month consumption
-# data_tarragona_month = pd.DataFrame(data_tarragona.groupby(by= 'Month')['kWh_diff'].sum())
-# data_tarragona_month['Month'] = data_tarragona_month.index
-
-# st.session_state['data_tarragona_month'] = data_tarragona_month
 
 @st.cache_data
-def create_apartment_list():
+def monthly_consumption(df):
+    df_month = pd.DataFrame(df.groupby(by= 'Month')['kWh_diff'].sum())
+    df_month['Month'] = df_month.index
+    return df_month
+
+st.session_state['data_tarragona_month'] = monthly_consumption(data_tarragona)
+
+@st.cache_data
+def monthly_consumption(df, piso):
+    df_flat_month = pd.DataFrame(df[df['Piso'] == piso].groupby(by= ['Month'])['kWh_diff'].sum()).reset_index()
+    return df_flat_month
+
+@st.cache_data
+def create_apartment_list_tarragona():
     apartment_list = []
     for i in range(9):
-        apartment_list.extend(range(100+i*100, 117+i*100))
+        apartment_list.extend(range(101+i*100, 117+i*100))
     return apartment_list
 
-apartment_list = create_apartment_list()
-st.session_state['apartment_list'] = apartment_list
+apartment_list_tarragona = create_apartment_list_tarragona()
+st.session_state['apartment_list_tarragona'] = apartment_list_tarragona
 
 # ===============================================================================================================
 
@@ -300,7 +308,6 @@ if authentication_status:
             # map_data = pd.DataFrame(
             # np.random.randn(150, 2) / [50, 50] + [41.12, 1.24],
             # columns=['lat', 'lon'])
-
             # st.map(map_data)
             st.markdown("""---""")
             

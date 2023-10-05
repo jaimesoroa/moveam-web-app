@@ -2,19 +2,20 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from st_on_hover_tabs import on_hover_tabs
-from datetime import date
-import requests
-import time as t
+# from datetime import date
+# import requests
+# import time as t
 import os
 import dotenv
 from dotenv import load_dotenv
-import streamlit_authenticator as stauth
-import yaml
+# import streamlit_authenticator as stauth
+# import yaml
 from yaml.loader import SafeLoader
 from st_pages import Page, Section, show_pages, add_page_title
-import sys
-import path
+# import sys
+# import path
 import altair as alt
+from Home import monthly_consumption
 
 
 
@@ -149,12 +150,12 @@ else:
 
             with tab_cons_1:
                 # st.dataframe(data_tarragona)
-                #st.bar_chart(st.session_state['data_tarragona_month'], y= 'kWh_diff')
+                # st.bar_chart(st.session_state['data_tarragona_month'], y= 'kWh_diff')
                 
                 
-                # chart_general_tarragona = alt.Chart(data= pd.DataFrame(st.session_state['data_tarragona_month'])).mark_bar().encode(x=alt.X('Month:N').title('Mes del año').axis(labelAngle=0), 
-                # y=alt.Y('kWh_diff:Q').title('Consumo de kWh'))
-                # st.altair_chart(chart_general_tarragona, use_container_width=True)
+                chart_general_tarragona = alt.Chart(data= pd.DataFrame(st.session_state['data_tarragona_month'])).mark_bar().encode(x=alt.X('Month:N').title('Mes del año').axis(labelAngle=0), 
+                y=alt.Y('kWh_diff:Q').title('Consumo de kWh'))
+                st.altair_chart(chart_general_tarragona, use_container_width=True)
                 
                 st.markdown("Integración de Dashboard de Power BI")
                 plot_power_bi_tarragona()
@@ -162,14 +163,13 @@ else:
 
             with tab_cons_2:
                 selected_apt_1 = st.selectbox('Seleccionar la vivienda cuyo consumo desea consultar',
-            (st.session_state['apartment_list']))
-
-                if selected_apt_1 == 101:
-                    st.markdown("Aquí pondríamos el detall del consumo del 101")
-                if selected_apt_1 == 102:
-                    st.markdown("Aquí pondríamos el detall del consumo del 102")
-                if selected_apt_1 == 103:
-                    st.markdown("Aquí pondríamos el detall del consumo del 103")
+                (st.session_state['apartment_list_tarragona']))
+                
+                flat_consumption = monthly_consumption(st.session_state['data_tarragona'], selected_apt_1)
+                
+                chart_flat_tarragona = alt.Chart(data= flat_consumption).mark_bar().encode(x=alt.X('Month:N').title('Mes del año').axis(labelAngle=0), 
+                y=alt.Y('kWh_diff:Q').title('Consumo de kWh'))
+                st.altair_chart(chart_flat_tarragona, use_container_width=True)
 
 
         # ===============================================================================================================

@@ -8,6 +8,7 @@ database/database_connection_old.py
 database/database_connection_prefect.py
 delete_flows.py
 script.js
+tarragona_flow-deployment.yaml
 
 # OS generated files #
 ######################

@@ -183,7 +183,7 @@ def read_consumption_tarragona():
     data_tarragona['Date'] = pd.to_datetime(data_tarragona['Date'])
     return data_tarragona
 
-st.session_state['data_tarragona'] = read_consumption_tarragona()
+# st.session_state['data_tarragona'] = read_consumption_tarragona()
 
 @st.cache_data(ttl= 3600)
 def monthly_consumption(df):
@@ -191,7 +191,7 @@ def monthly_consumption(df):
     df_month['Month'] = df_month.index
     return df_month
 
-st.session_state['data_tarragona_month'] = monthly_consumption(st.session_state['data_tarragona'])
+# st.session_state['data_tarragona_month'] = monthly_consumption(st.session_state['data_tarragona'])
 
 # ===============================================================================================================
 

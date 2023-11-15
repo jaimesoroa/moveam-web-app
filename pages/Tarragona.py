@@ -120,19 +120,19 @@ else:
         # ===============================================================================================================
         # Functions
         
-        @st.cache_data
-        def create_apartment_list_tarragona():
-            apartment_list = []
-            for i in range(9):
-                apartment_list.extend(range(101+i*100, 117+i*100))
-            return apartment_list
+        # @st.cache_data
+        # def create_apartment_list_tarragona():
+        #     apartment_list = []
+        #     for i in range(9):
+        #         apartment_list.extend(range(101+i*100, 117+i*100))
+        #     return apartment_list
 
-        apartment_list_tarragona = create_apartment_list_tarragona()
+        # apartment_list_tarragona = create_apartment_list_tarragona()
         
-        @st.cache_data
-        def monthly_consumption_flat_tarragona(df, piso):
-            df_flat_month = pd.DataFrame(df[df['Piso'] == piso].groupby(by= ['Month'])['kWh_diff'].sum()).reset_index()
-            return df_flat_month
+        # @st.cache_data
+        # def monthly_consumption_flat_tarragona(df, piso):
+        #     df_flat_month = pd.DataFrame(df[df['Piso'] == piso].groupby(by= ['Month'])['kWh_diff'].sum()).reset_index()
+        #     return df_flat_month
         
         @st.cache_resource
         def plot_power_bi_tarragona():
@@ -242,20 +242,23 @@ else:
 
             with tab_cons_2:
                 st.markdown('En construcción')
+                # First trial
                 # st.dataframe(data_tarragona)
                 # st.bar_chart(st.session_state['data_tarragona_month'], y= 'kWh_diff')
-                chart_general_tarragona = alt.Chart(data= pd.DataFrame(st.session_state['data_tarragona_month'])).mark_bar().encode(x=alt.X('Month:N').title('Mes del año').axis(labelAngle=0), 
-                y=alt.Y('kWh_diff:Q').title('Consumo de kWh'))
-                st.altair_chart(chart_general_tarragona, use_container_width=True)
+                
+                # Definitive trial
+                # chart_general_tarragona = alt.Chart(data= pd.DataFrame(st.session_state['data_tarragona_month'])).mark_bar().encode(x=alt.X('Month:N').title('Mes del año').axis(labelAngle=0), 
+                # y=alt.Y('kWh_diff:Q').title('Consumo de kWh'))
+                # st.altair_chart(chart_general_tarragona, use_container_width=True)
             
             with tab_cons_3:
                 st.markdown('En construcción')
-                selected_apt_1 = st.selectbox('Seleccionar la vivienda cuyo consumo desea consultar',
-                apartment_list_tarragona)
-                flat_consumption = monthly_consumption_flat_tarragona(st.session_state['data_tarragona'], selected_apt_1)
-                chart_flat_tarragona = alt.Chart(data= flat_consumption).mark_bar().encode(x=alt.X('Month:N').title('Mes del año').axis(labelAngle=0), 
-                y=alt.Y('kWh_diff:Q').title('Consumo de kWh'))
-                st.altair_chart(chart_flat_tarragona, use_container_width=True)
+                # selected_apt_1 = st.selectbox('Seleccionar la vivienda cuyo consumo desea consultar',
+                # apartment_list_tarragona)
+                # flat_consumption = monthly_consumption_flat_tarragona(st.session_state['data_tarragona'], selected_apt_1)
+                # chart_flat_tarragona = alt.Chart(data= flat_consumption).mark_bar().encode(x=alt.X('Month:N').title('Mes del año').axis(labelAngle=0), 
+                # y=alt.Y('kWh_diff:Q').title('Consumo de kWh'))
+                # st.altair_chart(chart_flat_tarragona, use_container_width=True)
 
 
         # ===============================================================================================================

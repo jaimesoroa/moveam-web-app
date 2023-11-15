@@ -4,6 +4,10 @@
 config.yaml
 jsoroa.ovpn
 microsoft.py
+database/database_connection_old.py
+database/database_connection_prefect.py
+delete_flows.py
+script.js
 
 # OS generated files #
 ######################
@@ -19,3 +23,5 @@ notebooks/
 ########
 data/
 old/
+documents/
+reference/

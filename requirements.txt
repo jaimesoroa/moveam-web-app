@@ -5,7 +5,7 @@ seaborn
 streamlit
 watchdog
 streamlit-on-Hover-tabs
-# datetime
+datetime
 # time
 # requests
 # os
@@ -24,3 +24,4 @@ sqlalchemy
 # selenium
 boto3
 path
+prefect

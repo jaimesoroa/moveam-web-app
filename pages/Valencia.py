@@ -16,12 +16,21 @@ from st_pages import Page, Section, show_pages, add_page_title
 # ===============================================================================================================
 # Page config
          
-st.set_page_config(
-    page_title="Moveam",
-    page_icon='images/Moveam_Transp.png',
-    layout="wide",
-    initial_sidebar_state="auto"
-)
+if st.session_state['logo'] == "moveam":
+    st.set_page_config(
+        page_title="Moveam",
+        page_icon='images/Moveam_Transp.png',
+        layout="wide",
+        initial_sidebar_state="auto"
+    )
+else:
+    st.set_page_config(
+        page_title="Moveam",
+        page_icon='images/logo-stay-blanco-trans_2.png',
+        layout="wide",
+        initial_sidebar_state="auto"
+    )
+    
 #########################################################################
 # it's possible to add menu iteams (upper right hand menu) inside set_page_config
 
@@ -51,15 +60,15 @@ else:
     # ===============================================================================================================
     # User authorization
     
-    almeria_authorized_users = ['jsoroa', 'fperez']
-    if st.session_state['username'] in almeria_authorized_users:
-        st.write(f'Bienvenido a la página de detalle de la propiedad de Almería, *{st.session_state["name"]}*')
+    valencia_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras']
+    if st.session_state['username'] in valencia_authorized_users:
+        st.write(f'Bienvenido a la página de detalle de la propiedad de Valencia')#, *{st.session_state["name"]}*')
 
         show_pages(
         [
             Page("Home.py", "Home", ":computer:"),
             Page("pages/Tarragona.py", "Tarragona", "🏡"),
-            Page("pages/Almeria.py", "Almería", "🏢"),
+            Page("pages/Valencia.py", "Valencia", "🏢"),
             Page("pages/Torrejon.py", "Torrejón", "🏙️"),
             Page("pages/Cordoba.py", "Córdoba", "🏫")
         ]
@@ -100,33 +109,43 @@ else:
         if tabs == 'Consumos':
             c1, c2,  = st.columns([15, 1.5], gap='medium')
             with c1:
-                st.title("Consumos de Almería")
+                st.title("Consumos de Valencia")
             with c2:
-                st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                if st.session_state['logo'] == "moveam":
+                    st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                else:
+                    st.image('images/logo-stay-blanco-trans_2.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
             st.markdown("""---""")
 
             # @st.cache_resource
-            # def plot_power_bi_almeria():
+            # def plot_power_bi_valencia():
             #     return st.markdown(f'<iframe title= {POWER_BI_TITLE_1} width="1140" height="541.25" src={POWER_BI_SRC_1} frameborder="0" allowFullScreen="true"></iframe>', unsafe_allow_html=True)
 
-            tab_cons_1, tab_cons_2 = st.tabs(["General", "Detalle"])
+            tab_cons_1, tab_cons_2, tab_cons_3 = st.tabs(["Dashboard", "General", "Detalle"])
 
             with tab_cons_1:
+                st.markdown("Integración de Dashboard de Power BI")
+                # plot_power_bi_valencia()
+                st.markdown("""---""")
+            
+            with tab_cons_2:
+                st.markdown('En construcción')
                 st.markdown("Consumos generales de la propiedad")
-                # plot_power_bi_almeria()
+                # plot_power_bi_valencia()
                 st.markdown("""---""")
 
-            with tab_cons_2:
-
+            with tab_cons_3:
+                st.markdown('En construcción')
                 selected_apt_2 = st.selectbox('Seleccionar la vivienda cuyo consumo desea consultar',
             (101, 102, 103))
-
                 if selected_apt_2 == 101:
                     st.markdown("Aquí pondríamos el detall del consumo del 101")
                 if selected_apt_2 == 102:
                     st.markdown("Aquí pondríamos el detall del consumo del 102")
                 if selected_apt_2 == 103:
                     st.markdown("Aquí pondríamos el detall del consumo del 103")
+            
+            
 
 
         # ===============================================================================================================
@@ -173,7 +192,7 @@ else:
         [
             Page("Home.py", "Home", ":computer:"),
             Page("pages/Tarragona.py", "Tarragona", "🏠"),
-            Page("pages/Almeria.py", "Almería", "🏠"),
+            Page("pages/Valencia.py", "Valencia", "🏠"),
             Page("pages/Torrejon.py", "Torrejón", "🏠"),
             Page("pages/Cordoba.py", "Córdoba", "🏫")
         ]

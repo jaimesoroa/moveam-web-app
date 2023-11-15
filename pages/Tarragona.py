@@ -15,18 +15,27 @@ from st_pages import Page, Section, show_pages, add_page_title
 # import sys
 # import path
 import altair as alt
-from Home import monthly_consumption
-
+from services.pbiembedservice import PbiEmbedService
+import json
 
 
 # ===============================================================================================================
 # Page config            
-st.set_page_config(
-    page_title="Moveam",
-    page_icon='images/Moveam_Transp.png',
-    layout="wide",
-    initial_sidebar_state="auto",
-)
+if st.session_state['logo'] == "moveam":
+    st.set_page_config(
+        page_title="Moveam",
+        page_icon='images/Moveam_Transp.png',
+        layout="wide",
+        initial_sidebar_state="auto"
+    )
+else:
+    st.set_page_config(
+        page_title="Moveam",
+        page_icon='images/logo-stay-blanco-trans_2.png',
+        layout="wide",
+        initial_sidebar_state="auto"
+    )
+    
 #########################################################################
 # it's possible to add menu iteams (upper right hand menu) inside set_page_config
 
@@ -88,28 +97,105 @@ else:
 # ===============================================================================================================
     # User authorization
     
-    tarragona_authorized_users = ['jsoroa', 'fperez', 'jfuster']
+    tarragona_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras']
     if st.session_state['username'] in tarragona_authorized_users:
-        st.write(f'Bienvenido a la página de detalle de la propiedad de Tarragona, *{st.session_state["name"]}*')
+        st.write(f'Bienvenido a la página de detalle de la propiedad de Tarragona')#, *{st.session_state["name"]}*')
 
         show_pages(
         [
             Page("Home.py", "Home", ":computer:"),
             Page("pages/Tarragona.py", "Tarragona", "🏡"),
-            Page("pages/Almeria.py", "Almería", "🏢"),
+            Page("pages/Valencia.py", "Valencia", "🏢"),
             Page("pages/Torrejon.py", "Torrejón", "🏙️"),
             Page("pages/Cordoba.py", "Córdoba", "🏫")
         ]
         )
 
-        # # ===============================================================================================================
-        # # System variables
+        # ===============================================================================================================
+        # System variables
 
-        load_dotenv()
-
-        POWER_BI_TARRAGONA_TITLE = os.environ.get("POWER_BI_TARRAGONA_TITLE")
-        POWER_BI_TARRAGONA_SRC = os.environ.get("POWER_BI_TARRAGONA_SRC")
+        WORKSPACE_ID = st.session_state['power_bi_moveam_wokspace_id']
+        REPORT_ID = st.session_state['powerbi_tarragona_id']
         
+        # ===============================================================================================================
+        # Functions
+        
+        @st.cache_data
+        def create_apartment_list_tarragona():
+            apartment_list = []
+            for i in range(9):
+                apartment_list.extend(range(101+i*100, 117+i*100))
+            return apartment_list
+
+        apartment_list_tarragona = create_apartment_list_tarragona()
+        
+        @st.cache_data
+        def monthly_consumption_flat_tarragona(df, piso):
+            df_flat_month = pd.DataFrame(df[df['Piso'] == piso].groupby(by= ['Month'])['kWh_diff'].sum()).reset_index()
+            return df_flat_month
+        
+        @st.cache_resource
+        def plot_power_bi_tarragona():
+            # return st.markdown(f'<iframe title= {POWER_BI_TARRAGONA_TITLE} width="1140" height="541.25" src={POWER_BI_TARRAGONA_SRC} frameborder="0" allowFullScreen="true"></iframe>', unsafe_allow_html=True)
+            embed_info = PbiEmbedService().get_embed_params_for_single_report(WORKSPACE_ID, REPORT_ID)
+            api_response_json = json.dumps(embed_info)
+            
+            html_code = f'''
+                <!DOCTYPE html>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/powerbi-client/2.15.1/powerbi.min.js" integrity="sha512-OWIl8Xrlo8yQjWN5LcMz5SIgNnzcJqeelChqPMIeQGnEFJ4m1fWWn668AEXBrKlsuVbvDebTUJGLRCtRCCiFkg==" crossorigin="anonymous"></script>
+                <div id="reportContainer">
+                    <iframe width="100%" height=750" src="https://app.powerbi.com/reportEmbed?reportId={REPORT_ID}&groupId={WORKSPACE_ID}" frameborder="0" allowFullScreen="true"></iframe>
+                </div>
+                <style>
+                    #reportContainer {{
+                        height: 100vh;
+                        width: 100%;
+                    }}
+                </style>
+                <script type="text/javascript">
+                    window.onload = function() {{
+                        // Parse the JSON data received from the API
+                        var apiResponse = JSON.parse({api_response_json});
+                        // Extract token and other properties from the parsed data
+                        var accessToken = apiResponse.accessToken;
+                        var expiration = apiResponse.tokenExpiry;
+                        var models = window["powerbi-client"].models;
+                        var config = {{
+                            type: 'report',
+                            tokenType: models.TokenType.Embed,
+                            accessToken: accessToken,
+                            embedUrl: 'https://app.powerbi.com/reportEmbed?reportId={REPORT_ID}&groupId={WORKSPACE_ID}',
+                            settings: {{
+                                filterPaneEnabled: true,
+                                navContentPaneEnabled: true,
+                                panes: {{
+                                    filters: {{
+                                        expanded: true,
+                                        visible: true
+                                    }}
+                                }},
+                                layoutType: models.LayoutType.Custom, // Ensure this property is set to Custom
+                                customLayout: {{
+                                    displayOption: models.DisplayOption.FitToPage,
+                                    pageSize: {{
+                                        // These dimensions define the size of the report page.
+                                        type: models.PageSizeType.Custom,
+                                        // Higher width, smaller page
+                                        width: 1300, // Set the desired width. If too small, the report page gets cut
+                                        // Height doesn't change the page size, but small height covers the bottom.
+                                        height: 720 // Set the desired height
+                                    }}
+                                }}
+                            }}
+                        }};
+                        var reportContainer = document.getElementById('reportContainer');
+                        var report = powerbi.embed(reportContainer, config);
+                    }};
+                </script>
+            '''
+            # Display embedded report. These dimensions define the streamlit window.
+            st.components.v1.html(html_code, height= 700, width= 1200, scrolling= True)
+            st.markdown("""---""")
         
 
         # ===============================================================================================================
@@ -138,35 +224,35 @@ else:
             with c1:
                 st.title("Consumos de Tarragona")
             with c2:
-                st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                if st.session_state['logo'] == "moveam":
+                    st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                else:
+                    st.image('images/logo-stay-blanco-trans_2.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
             st.markdown("""---""")
             
 
-            @st.cache_resource
-            def plot_power_bi_tarragona():
-                return st.markdown(f'<iframe title= {POWER_BI_TARRAGONA_TITLE} width="1140" height="541.25" src={POWER_BI_TARRAGONA_SRC} frameborder="0" allowFullScreen="true"></iframe>', unsafe_allow_html=True)
+            
 
-            tab_cons_1, tab_cons_2 = st.tabs(["General", "Detalle"])
+            tab_cons_1, tab_cons_2, tab_cons_3 = st.tabs(["Dashboard", "General", "Detalle"])
 
             with tab_cons_1:
-                # st.dataframe(data_tarragona)
-                # st.bar_chart(st.session_state['data_tarragona_month'], y= 'kWh_diff')
-                
-                
-                chart_general_tarragona = alt.Chart(data= pd.DataFrame(st.session_state['data_tarragona_month'])).mark_bar().encode(x=alt.X('Month:N').title('Mes del año').axis(labelAngle=0), 
-                y=alt.Y('kWh_diff:Q').title('Consumo de kWh'))
-                st.altair_chart(chart_general_tarragona, use_container_width=True)
-                
                 st.markdown("Integración de Dashboard de Power BI")
                 plot_power_bi_tarragona()
                 st.markdown("""---""")
 
             with tab_cons_2:
+                st.markdown('En construcción')
+                # st.dataframe(data_tarragona)
+                # st.bar_chart(st.session_state['data_tarragona_month'], y= 'kWh_diff')
+                chart_general_tarragona = alt.Chart(data= pd.DataFrame(st.session_state['data_tarragona_month'])).mark_bar().encode(x=alt.X('Month:N').title('Mes del año').axis(labelAngle=0), 
+                y=alt.Y('kWh_diff:Q').title('Consumo de kWh'))
+                st.altair_chart(chart_general_tarragona, use_container_width=True)
+            
+            with tab_cons_3:
+                st.markdown('En construcción')
                 selected_apt_1 = st.selectbox('Seleccionar la vivienda cuyo consumo desea consultar',
-                (st.session_state['apartment_list_tarragona']))
-                
-                flat_consumption = monthly_consumption(st.session_state['data_tarragona'], selected_apt_1)
-                
+                apartment_list_tarragona)
+                flat_consumption = monthly_consumption_flat_tarragona(st.session_state['data_tarragona'], selected_apt_1)
                 chart_flat_tarragona = alt.Chart(data= flat_consumption).mark_bar().encode(x=alt.X('Month:N').title('Mes del año').axis(labelAngle=0), 
                 y=alt.Y('kWh_diff:Q').title('Consumo de kWh'))
                 st.altair_chart(chart_flat_tarragona, use_container_width=True)
@@ -232,7 +318,7 @@ else:
         [
             Page("Home.py", "Home", ":computer:"),
             Page("pages/Tarragona.py", "Tarragona", "🏠"),
-            Page("pages/Almeria.py", "Almería", "🏠"),
+            Page("pages/Valencia.py", "Valencia", "🏠"),
             Page("pages/Torrejon.py", "Torrejón", "🏠"),
             Page("pages/Cordoba.py", "Córdoba", "🏫")
         ]

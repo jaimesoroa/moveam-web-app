@@ -1,0 +1,48 @@
+###
+### A complete description of a Prefect Deployment for flow 'tarragona-connection-flow'
+###
+name: tarragona-connection-flow_trial_deployment
+description: null
+version: dev
+# The work queue that will handle this deployment's runs
+work_queue_name: tarragona_queue
+work_pool_name: default-agent-pool
+tags: []
+parameters: {}
+schedule:
+  cron: 08 11 * * *
+  timezone: Europe/Madrid
+  day_or: true
+is_schedule_active: true
+infra_overrides: {}
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: tarragona-connection-flow
+manifest_path: null
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  stream_output: true
+  working_dir: null
+  _block_document_id: 6ca8aaeb-6807-47e5-83f5-3ca5b57e767f
+  _block_document_name: anonymous-4c92b17e-0421-471b-bdd8-e5cbe2cbf8e1
+  _is_anonymous: true
+  block_type_slug: process
+  _block_type_slug: process
+storage: null
+path: /Users/jaimesoroarubio/code/work_projects/Moveam/moveam-web-app
+entrypoint: database/database_connection_prefect.py:tarragona_flow
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties: {}
+  required: null
+  definitions: null
+timestamp: '2023-10-31T10:07:16.995483+00:00'
+triggers: []
+enforce_parameter_schema: null

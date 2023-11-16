@@ -4,10 +4,10 @@ import numpy as np
 from st_on_hover_tabs import on_hover_tabs
 # from datetime import date
 # import requests
-import time as t
+# import time as t
 import os
 # import dotenv
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
@@ -15,16 +15,16 @@ from st_pages import Page, Section, show_pages, add_page_title
 from streamlit_extras.switch_page_button import switch_page
 # import subprocess
 import sys
-import msal
+# import msal
 # import time
 # import threading
 # from botocore.exceptions import ClientError
 import altair as alt
 import boto3
 from botocore.exceptions import ClientError
-from azure.identity import DefaultAzureCredential
-from azure.identity import ClientSecretCredential
-import json
+# from azure.identity import DefaultAzureCredential
+# from azure.identity import ClientSecretCredential
+# import json
 from services.pbiembedservice import PbiEmbedService
 
 

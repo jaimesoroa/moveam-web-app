@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
 
-from flask import current_app as app
+# from flask import current_app as app
 import msal
 import streamlit as st
 

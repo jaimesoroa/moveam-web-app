@@ -20,8 +20,13 @@ mysqlclient
 sqlalchemy
 # mysql-python
 # path
-# msal_streamlit_authentication
+msal_streamlit_authentication
+msal
 # selenium
 boto3
 path
 prefect
+# json
+altair
+boto3
+botocore

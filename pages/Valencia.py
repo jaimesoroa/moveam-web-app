@@ -156,7 +156,10 @@ else:
             with c1:
                 st.title("Vehículos")
             with c2:
-                st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                if st.session_state['logo'] == "moveam":
+                    st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                else:
+                    st.image('images/logo-stay-blanco-trans_2.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
             st.markdown("""---""")
 
             st.markdown("Gestión de vehículos")
@@ -169,7 +172,10 @@ else:
             with c1:
                 st.title("Zonas comunes")
             with c2:
-                st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                if st.session_state['logo'] == "moveam":
+                    st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                else:
+                    st.image('images/logo-stay-blanco-trans_2.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
             st.markdown("""---""")
 
             st.markdown("Estadísticas de las zonas comunes")
@@ -182,7 +188,10 @@ else:
             with c1:
                 st.title("Informes")
             with c2:
-                st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                if st.session_state['logo'] == "moveam":
+                    st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                else:
+                    st.image('images/logo-stay-blanco-trans_2.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
             st.markdown("""---""")
 
             st.markdown("Herramientas de generación de informes")

@@ -6,11 +6,11 @@ from st_on_hover_tabs import on_hover_tabs
 # import requests
 # import time as t
 import os
-import dotenv
-from dotenv import load_dotenv
+# import dotenv
+# from dotenv import load_dotenv
 # import streamlit_authenticator as stauth
 # import yaml
-from yaml.loader import SafeLoader
+# from yaml.loader import SafeLoader
 from st_pages import Page, Section, show_pages, add_page_title
 # import sys
 # import path
@@ -269,7 +269,10 @@ else:
             with c1:
                 st.title("Vehículos")
             with c2:
-                st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                if st.session_state['logo'] == "moveam":
+                    st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                else:
+                    st.image('images/logo-stay-blanco-trans_2.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
             st.markdown("""---""")
 
             st.markdown("Gestión de vehículos")
@@ -282,7 +285,10 @@ else:
             with c1:
                 st.title("Zonas comunes")
             with c2:
-                st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                if st.session_state['logo'] == "moveam":
+                    st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                else:
+                    st.image('images/logo-stay-blanco-trans_2.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
             st.markdown("""---""")
 
             st.markdown("Estadísticas de las zonas comunes")
@@ -295,26 +301,29 @@ else:
             with c1:
                 st.title("Informes")
             with c2:
-                st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                if st.session_state['logo'] == "moveam":
+                    st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                else:
+                    st.image('images/logo-stay-blanco-trans_2.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
             st.markdown("""---""")
 
             st.markdown("Herramientas de generación de informes")
             
-            data_to_download = st.session_state['data_tarragona']
+            # data_to_download = st.session_state['data_tarragona']
             
-            @st.cache_data
-            def convert_df(df):
-                # IMPORTANT: Cache the conversion to prevent computation on every rerun
-                return df.to_csv().encode('utf-8')
+            # @st.cache_data
+            # def convert_df(df):
+            #     # IMPORTANT: Cache the conversion to prevent computation on every rerun
+            #     return df.to_csv().encode('utf-8')
 
-            csv = convert_df(data_to_download)
+            # csv = convert_df(data_to_download)
 
-            st.download_button(
-                label="Descargar informe en CSV",
-                data=csv,
-                file_name='Informe_tarragona.csv',
-                mime='text/csv',
-            )
+            # st.download_button(
+            #     label="Descargar informe en CSV",
+            #     data=csv,
+            #     file_name='Informe_tarragona.csv',
+            #     mime='text/csv',
+            # )
             
     else:
         show_pages(

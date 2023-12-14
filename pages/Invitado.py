@@ -1,23 +1,12 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
 from st_on_hover_tabs import on_hover_tabs
-# from datetime import date
-# import requests
-# import time as t
-import os
-# import dotenv
-from dotenv import load_dotenv
-# import streamlit_authenticator as stauth
-# import yaml
-# from yaml.loader import SafeLoader
 from st_pages import Page, Section, show_pages, add_page_title
 from services.pbiembedservice import PbiEmbedService
 import json
 
+
 # ===============================================================================================================
-# Page config
-         
+# Page config            
 if st.session_state['logo_cabecera'] == "moveam":
     st.set_page_config(
         page_title="Moveam",
@@ -45,7 +34,7 @@ else:
 
 if "params" not in st.session_state:
     st.session_state['params'] = dict()
-
+    
 # ===============================================================================================================
 # Authentication
 
@@ -58,13 +47,13 @@ if not st.session_state["authentication_status"]:
         )
 
 else:
-   
-    # ===============================================================================================================
+
+# ===============================================================================================================
     # User authorization
     
-    torrejon_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras']
-    if st.session_state['username'] in torrejon_authorized_users:
-        st.write(f'Bienvenido a la página de detalle de la propiedad de Torrejón')#, *{st.session_state["name"]}*')
+    invitado_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'invitado']
+    if st.session_state['username'] in invitado_authorized_users:
+        st.write(f'Bienvenido a la página de Valdemoro')
 
         show_pages(
         [
@@ -76,23 +65,32 @@ else:
             Page("pages/Invitado.py", "Invitado", "🏘️")
         ]
         )
-        
+
         # ===============================================================================================================
         # System variables
 
-        # To be used if necessary for another Power BI dashboard
-        # load_dotenv()
-
-        # dirname = os.path.dirname(__file__)
-
         WORKSPACE_ID = st.session_state['power_bi_moveam_wokspace_id']
-        REPORT_ID = st.session_state['powerbi_torrejon_id']
+        REPORT_ID = st.session_state['powerbi_valdemoro_id']
         
         # ===============================================================================================================
         # Functions
         
+        # @st.cache_data
+        # def create_apartment_list_tarragona():
+        #     apartment_list = []
+        #     for i in range(9):
+        #         apartment_list.extend(range(101+i*100, 117+i*100))
+        #     return apartment_list
+
+        # apartment_list_tarragona = create_apartment_list_tarragona()
+        
+        # @st.cache_data
+        # def monthly_consumption_flat_tarragona(df, piso):
+        #     df_flat_month = pd.DataFrame(df[df['Piso'] == piso].groupby(by= ['Month'])['kWh_diff'].sum()).reset_index()
+        #     return df_flat_month
+        
         # @st.cache_resource
-        def plot_power_bi_torrejon():
+        def plot_power_bi_valdemoro():
             # return st.markdown(f'<iframe title= {POWER_BI_TARRAGONA_TITLE} width="1140" height="541.25" src={POWER_BI_TARRAGONA_SRC} frameborder="0" allowFullScreen="true"></iframe>', unsafe_allow_html=True)
             embed_info = PbiEmbedService().get_embed_params_for_single_report(WORKSPACE_ID, REPORT_ID)
             api_response_json = json.dumps(embed_info)
@@ -138,7 +136,7 @@ else:
                                         // These dimensions define the size of the report page.
                                         type: models.PageSizeType.Custom,
                                         // Higher width, smaller page
-                                        width: 1300, // Set the desired width
+                                        width: 1300, // Set the desired width. If too small, the report page gets cut
                                         // Height doesn't change the page size, but small height covers the bottom.
                                         height: 720 // Set the desired height
                                     }}
@@ -172,46 +170,36 @@ else:
                                                           'white-space': 'nowrap',
                                                           'text-transform': 'None'}},
                                      key="0")
-                
+
         # ===============================================================================================================
         # Tab Consumos
-
+        
         if tabs == 'Consumos':
             c1, c2,  = st.columns([15, 1.5], gap='medium')
             with c1:
-                st.title("Consumos de Torrejón")
+                st.title("Consumos de Valdemoro")
             with c2:
                 if st.session_state['logo'] == "moveam":
                     st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
                 else:
                     st.image('images/logo-stay-blanco-trans_2.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
             st.markdown("""---""")
+            
+
+            
 
             tab_cons_1, tab_cons_2, tab_cons_3 = st.tabs(["Dashboard", "General", "Detalle"])
 
             with tab_cons_1:
                 st.markdown("Integración de Dashboard")
-                plot_power_bi_torrejon()
-                st.markdown("""---""")
-            
-            with tab_cons_2:
-                st.markdown('En construcción')
-                st.markdown("Consumos generales de la propiedad")
-                # plot_power_bi_torrejon()
+                plot_power_bi_valdemoro()
                 st.markdown("""---""")
 
+            with tab_cons_2:
+                st.markdown('En construcción')
+            
             with tab_cons_3:
                 st.markdown('En construcción')
-                selected_apt_3 = st.selectbox('Seleccionar la vivienda cuyo consumo desea consultar',
-            (101, 102, 103))
-                if selected_apt_3 == 101:
-                    st.markdown("Aquí pondríamos el detall del consumo del 101")
-                if selected_apt_3 == 102:
-                    st.markdown("Aquí pondríamos el detall del consumo del 102")
-                if selected_apt_3 == 103:
-                    st.markdown("Aquí pondríamos el detall del consumo del 103")
-                    
-            
 
 
         # ===============================================================================================================
@@ -261,7 +249,8 @@ else:
             st.markdown("""---""")
 
             st.markdown("Herramientas de generación de informes")
-
+            
+            
     else:
         show_pages(
         [
@@ -273,12 +262,13 @@ else:
             Page("pages/Invitado.py", "Invitado", "🏘️")
         ]
         )
+        
         st.write('No está autorizado a ver esta propiedad')
         st.markdown('<style>' + open('style.css').read() + '</style>', unsafe_allow_html=True)
         
         with st.sidebar:
-                tabs = on_hover_tabs(tabName=[''], 
-                                     iconName=[''],
+                tabs = on_hover_tabs(tabName=['Home'], 
+                                     iconName=['🏠'],
                                      default_choice= 0,
                                      styles= {'navtab': {'background-color':'#c4ede3',
                                                           'color': '#818181',

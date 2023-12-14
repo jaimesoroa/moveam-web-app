@@ -21,7 +21,7 @@ import json
 
 # ===============================================================================================================
 # Page config            
-if st.session_state['logo'] == "moveam":
+if st.session_state['logo_cabecera'] == "moveam":
     st.set_page_config(
         page_title="Moveam",
         page_icon='images/Moveam_Transp.png',
@@ -107,7 +107,8 @@ else:
             Page("pages/Tarragona.py", "Tarragona", "🏡"),
             Page("pages/Valencia.py", "Valencia", "🏢"),
             Page("pages/Torrejon.py", "Torrejón", "🏙️"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫")
+            Page("pages/Cordoba.py", "Córdoba", "🏫"),
+            Page("pages/Invitado.py", "Invitado", "🏘️")
         ]
         )
 
@@ -134,7 +135,7 @@ else:
         #     df_flat_month = pd.DataFrame(df[df['Piso'] == piso].groupby(by= ['Month'])['kWh_diff'].sum()).reset_index()
         #     return df_flat_month
         
-        @st.cache_resource
+        # @st.cache_resource
         def plot_power_bi_tarragona():
             # return st.markdown(f'<iframe title= {POWER_BI_TARRAGONA_TITLE} width="1140" height="541.25" src={POWER_BI_TARRAGONA_SRC} frameborder="0" allowFullScreen="true"></iframe>', unsafe_allow_html=True)
             embed_info = PbiEmbedService().get_embed_params_for_single_report(WORKSPACE_ID, REPORT_ID)
@@ -236,7 +237,7 @@ else:
             tab_cons_1, tab_cons_2, tab_cons_3 = st.tabs(["Dashboard", "General", "Detalle"])
 
             with tab_cons_1:
-                st.markdown("Integración de Dashboard de Power BI")
+                st.markdown("Integración de Dashboard")
                 plot_power_bi_tarragona()
                 st.markdown("""---""")
 
@@ -332,11 +333,12 @@ else:
             Page("pages/Tarragona.py", "Tarragona", "🏠"),
             Page("pages/Valencia.py", "Valencia", "🏠"),
             Page("pages/Torrejon.py", "Torrejón", "🏠"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫")
+            Page("pages/Cordoba.py", "Córdoba", "🏫"),
+            Page("pages/Invitado.py", "Invitado", "🏘️")
         ]
         )
         
-        st.write('You are not authorized to see this property')
+        st.write('No está autorizado a ver esta propiedad')
         st.markdown('<style>' + open('style.css').read() + '</style>', unsafe_allow_html=True)
         
         with st.sidebar:

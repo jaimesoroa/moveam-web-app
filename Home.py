@@ -31,10 +31,10 @@ from services.pbiembedservice import PbiEmbedService
 # ===============================================================================================================
 # Page config
 
-# st.session_state['logo'] = "moveam"
-st.session_state['logo'] = "stay"
+# st.session_state['logo'] = "stay"
+st.session_state['logo_cabecera'] = "moveam"
 
-if st.session_state['logo'] == "moveam":
+if st.session_state['logo_cabecera'] == "moveam":
     st.set_page_config(
         page_title="Moveam",
         page_icon='images/Moveam_Transp.png',
@@ -48,6 +48,7 @@ else:
         layout="wide",
         initial_sidebar_state="auto"
     )
+
 
 #########################################################################
 # it's possible to add menu items (upper right hand menu) inside set_page_config
@@ -83,7 +84,17 @@ name, authentication_status, username = authenticator.login('Login', 'main')
 st.session_state['authentication_status'] = authentication_status
 st.session_state['username'] = username
 
-    
+# To generate hashed passwords
+# hashed_passwords = stauth.Hasher(['abc', 'def']).generate()
+
+# Define logo based on user
+moveam_users = ['jsoroa', 'fperez', 'jfuster', 'invitado']
+stay_users = ['aheras']
+
+if st.session_state['username'] in moveam_users:
+    st.session_state['logo'] = "moveam"
+else:
+    st.session_state['logo'] = "stay"
 
 
 if "params" not in st.session_state:
@@ -151,6 +162,9 @@ st.session_state['TENANT_ID'] = powerbi_secrets['Moveam_app_microsoft_tenant_id'
 st.session_state['powerbi_tarragona_id'] = powerbi_secrets['powerbi_tarragona_id']
 st.session_state['powerbi_torrejon_id'] = powerbi_secrets['powerbi_torrejon_id']
 st.session_state['powerbi_cordoba_id'] = powerbi_secrets['powerbi_cordoba_id']
+st.session_state['powerbi_valdemoro_title'] = powerbi_secrets['powerbi_valdemoro_title']
+st.session_state['powerbi_valdemoro_source'] = powerbi_secrets['powerbi_valdemoro_source']
+st.session_state['powerbi_valdemoro_id'] = powerbi_secrets['powerbi_valdemoro_id']
 
 
 # Load configuration
@@ -244,7 +258,8 @@ if authentication_status:
             Page("pages/Tarragona.py", "Tarragona", "🏡"),
             Page("pages/Valencia.py", "Valencia", "🏢"),
             Page("pages/Torrejon.py", "Torrejón", "🏙️"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫")
+            Page("pages/Cordoba.py", "Córdoba", "🏫"),
+            Page("pages/Invitado.py", "Invitado", "🏘️")
         ]
         )
 
@@ -309,7 +324,7 @@ if authentication_status:
 
         st.markdown("""---""")
 
-        tab_prop_1, tab_prop_2, tab_prop_3, tab_prop_4 = st.tabs(["Tarragona", "Valencia", "Torrejón", "Córdoba"])
+        tab_prop_1, tab_prop_2, tab_prop_3, tab_prop_4, tab_prop_5 = st.tabs(["Tarragona", "Valencia", "Torrejón", "Córdoba", "Invitado"])
 
         with tab_prop_1:
             # st.metric(label="Consumo de energía del último mes", value="18.500 kWh", delta="+2%")
@@ -341,6 +356,12 @@ if authentication_status:
             cordoba_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'cordoba_analitica')
             if cordoba_analitica:
                 switch_page('Córdoba')
+        
+        with tab_prop_5:
+            # st.markdown("Información")
+            invitado_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'invitado_analitica')
+            if invitado_analitica:
+                switch_page('Invitado')
     
     # ===============================================================================================================
     # Tab Otros

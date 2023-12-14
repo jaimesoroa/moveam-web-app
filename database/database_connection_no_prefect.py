@@ -78,7 +78,7 @@ from prefect.client.orchestration import PrefectClient
 # AWS secrets
 
 # AWS secrets Datadis
-@task(log_prints=True)
+# @task(log_prints=True)
 def get_secret_datadis():
 
     secret_name = "Datadis_connection"
@@ -104,7 +104,7 @@ def get_secret_datadis():
     return eval(secret)
 
 # AWS secrets Database
-@task(log_prints=True)
+# @task(log_prints=True)
 def get_secrets_database():
 
     secret_name = "db_tarragona_historico_Jaime"
@@ -163,7 +163,7 @@ def get_secrets_prefect():
 # ==============================================================================================
 # Datadis connection
 
-@task(log_prints=True)
+# @task(log_prints=True)
 def datadis_connection(username, password, authorized_nif):
     # Datos Moveam de Stay
     data_moveam = {'username':username,
@@ -184,78 +184,31 @@ def datadis_connection(username, password, authorized_nif):
 
 # ==============================================================================================
 # Whole CUPS list
-@task(log_prints=True)
+# @task(log_prints=True)
 def whole_cups_list(supplies_response):
     cups_list= []
     supplies_response_dict = eval(supplies_response.text)
     for supply in supplies_response_dict:
         cups_list.append(supply['cups'])
-    # Temporary list of common areas CUPS to avoid requesting the whole list without authorization
-    cups_zzcc = ['ES0031105565704002KT0F', 'ES0031105565704001CE0F', 
-                 'ES0031105565708002XK0F', 'ES0031105565704017KS0F', 
-                 'ES0031105565670001ZQ0F', 'ES0031105565670002ZV0F', 
-                 'ES0031105565707001JD0F', 'ES0031105531573042AM0F', 
-                 'ES0031105531573040AA0F', 'ES0031105565672001DS0F', 
-                 'ES0031105565705001HX0F', 'ES0031105531571040PG0F', 
-                 'ES0031105531571041PM0F', 'ES0031105531573041AG0F', 
-                 'ES0031105531571042PY0F']
-    cups_list = cups_zzcc
-    
     return cups_list
-
-@task(log_prints=True)
-def cups_month():
-    current_month = datetime.today().strftime('%m')
-    current_day = datetime.today().strftime('%d')
-    # current_month = '8'
-    if current_month == '1':
-        previous_month = '12'
-    else:
-        previous_month = str(int(current_month)-1)
-    # current_day = '1'
-    if int(current_day) < 3:
-        if len(current_month) == 1 and len(previous_month) == 1:
-            months = [f'0{previous_month}',f'0{current_month}']
-        elif len(current_month) > 1 and len(previous_month) == 1:
-            months = [f'0{previous_month}', current_month]
-        elif len(current_month) == 1 and len(previous_month) > 1:
-            months = [previous_month,f'0{current_month}']
-        else:
-            months = [previous_month, current_month]
-    else:
-        if len(current_month) == 1:
-            months = [f'0{current_month}']
-        else:
-            months = [current_month]
-    return current_month, months
-
-# # Define a daily schedule at 4 AM
-# schedule = schedules.CronSchedule("* * * * *")
-
 
 # ==============================================================================================
 # Download consumption from Datadis
-@task(log_prints=True)
-def consumption(months, cups_list, headers_moveam):
+# @task(log_prints=True)
+def consumption(months_list, cups_list, headers_moveam):
     # Create the list of lists of consumptions
     df = pd.DataFrame(columns=['cups', 'date', 'time', 'consumptionKWh', 'obtainMethod', 'surplusEnergyKWh'])
     column_names= df.columns
     consumption= [column_names]
+    months = months_list
     cups = cups_list
-    status_code_list = []
-    current_year = datetime.today().strftime('%Y')
-    previous_year = str(int(current_year)-1)
     for month in months:
-        if len(months) == 2 and month == months[0] and month == '12':
-            year = previous_year
-        else:
-            year = current_year
         for i in range(len(cups)):
             consumption_params = {
             "cups": cups[i],
             "distributorCode": "2",
-            "startDate": f'{year}/{month}',
-            "endDate": f'{year}/{month}',
+            "startDate": f'2023/{month}',
+            "endDate": f'2023/{month}',
             "measurementType": "0",
             "measurePointType": "5",
             "pointType": "5",
@@ -264,7 +217,6 @@ def consumption(months, cups_list, headers_moveam):
             # API request
             consumption_response = requests.get("https://datadis.es/api-private/api/get-consumption-data", params= consumption_params, headers= headers_moveam)
             # Only use valid responses
-            status_code_list.append(consumption_response.status_code)
             if consumption_response.status_code == 200 and len(consumption_response.text) > 3:
                 response_text = consumption_response.text
                 # Remove nulls from text to avoid errors
@@ -283,13 +235,12 @@ def consumption(months, cups_list, headers_moveam):
     consumption_df['month'] = pd.to_datetime(consumption_df['date']).dt.month
     consumption_df['lastUpdated'] = datetime.today().strftime('%Y-%m-%d %H:%M')
     
-    return consumption_df, status_code_list
+    return consumption_df
 
 # ==============================================================================================
 # Database connection
-@task(log_prints=True)
-# Database connection
-def database_connection(username, password, host, database, months, df):
+# @task(log_prints=True)
+def database_connection(username, password, host, database, month, df):
     url_object = db.URL.create(
         "mysql+mysqldb",
         username=username,
@@ -306,42 +257,61 @@ def database_connection(username, password, host, database, months, df):
     
     ELECTRICIDAD = META_DATA.tables['ELECTRICIDAD']
     
-    # delete the whole current month, and previous months if neccessary
-    for month in months:
-        dele = ELECTRICIDAD.delete().where(ELECTRICIDAD.c.month == int(month))
-        with engine.begin() as conn:
-            conn.execute(dele)
-        print(f'Month {month} deleted')
+    # delete the whole current month
+    dele = ELECTRICIDAD.delete().where(ELECTRICIDAD.c.month == month)
     
-    # conn.invalidate()
-    conn.close()
+    with engine.begin() as conn:
+        conn.execute(dele)
+        conn.invalidate()
+        conn.close()
     
     # Insert whole DataFrame into MySQL (much faster)
     df.to_sql('ELECTRICIDAD', con = engine, if_exists = 'append', chunksize = 2000,index=False)
-    
-    print('Df written in database')
     
     engine.dispose()
     
     return None
 
-@flow(name="cordoba-connection-flow", log_prints=True)
+# @task(log_prints=True)
+def cups_month(supplies_response):
+    # cups_list = whole_cups_list(supplies_response)
+    cups_zzcc = ['ES0031105565704002KT0F', 'ES0031105565704001CE0F', 
+                 'ES0031105565708002XK0F', 'ES0031105565704017KS0F', 
+                 'ES0031105565670001ZQ0F', 'ES0031105565670002ZV0F', 
+                 'ES0031105565707001JD0F', 'ES0031105531573042AM0F', 
+                 'ES0031105531573040AA0F', 'ES0031105565672001DS0F', 
+                 'ES0031105565705001HX0F', 'ES0031105531571040PG0F', 
+                 'ES0031105531571041PM0F', 'ES0031105531573041AG0F', 
+                 'ES0031105531571042PY0F']
+    cups_list = cups_zzcc
+    current_month = datetime.today().strftime('%m')
+    # current_month = '6'
+    if len(current_month) == 1:
+        current_month_str = f'0{current_month}'
+    else:
+        current_month_str = current_month
+    return cups_list, current_month, current_month_str
+
+# # Define a daily schedule at 4 AM
+# schedule = schedules.CronSchedule("* * * * *")
+
+
+# @flow(name="cordoba-connection-flow", log_prints=True)
 def cordoba_flow():
     
     datadis_secrets = get_secret_datadis()
     database_secrets = get_secrets_database()
     (headers_moveam, supplies_response) = datadis_connection(datadis_secrets['datadis_username'], 
                 datadis_secrets['datadis_password'], datadis_secrets['datadis_authorized_nif'])
-    
-    cups_list = whole_cups_list(supplies_response)
 
-    (current_month, months) = cups_month()
+    (cups_list, current_month, current_month_str) = cups_month(supplies_response)
+    print(f'cups list defined: {cups_list}, month defined: {current_month}')
     
-    consumption_df = consumption(months, cups_list, headers_moveam)
+    
+    consumption_df = consumption(current_month_str, cups_list, headers_moveam)
     database_connection(database_secrets['username'], database_secrets['password'], 
-        database_secrets['host'], database_secrets['dbname_cordoba'], months, consumption_df)
-    
-    return consumption_df
+        database_secrets['host'], database_secrets['dbname_cordoba'], current_month, consumption_df)
+    return None
     
 # Connection to Prefect cloud, not used for the moment.
 async def cloud_connection(prefect_api_url, prefect_api_key, prefect_tenant_id, cordoba_flow):
@@ -377,8 +347,10 @@ if __name__ == "__main__":
     # asyncio.run(cloud_connection(prefect_api_url, prefect_api_key, prefect_tenant_id, cordoba_flow))
 
     # Run the Prefect flow
-    cordoba_deploy= cordoba_flow.to_deployment(name="cordoba-first-deployment", cron= '0 3 * * *')#, work_pool_name= 'cordoba_pool', work_queue_name= 'cordoba_queue')
-    serve(cordoba_deploy)
+    # cordoba_deploy= cordoba_flow.to_deployment(name="cordoba-first-deployment")#, cron= '0 3 * * *')#, work_pool_name= 'cordoba_pool', work_queue_name= 'cordoba_queue')
+    # serve(cordoba_deploy)
+    
+    cordoba_flow()
     
     # To serve several flows at once:
 

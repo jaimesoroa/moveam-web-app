@@ -16,7 +16,7 @@ from st_pages import Page, Section, show_pages, add_page_title
 # ===============================================================================================================
 # Page config
          
-if st.session_state['logo'] == "moveam":
+if st.session_state['logo_cabecera'] == "moveam":
     st.set_page_config(
         page_title="Moveam",
         page_icon='images/Moveam_Transp.png',
@@ -70,7 +70,8 @@ else:
             Page("pages/Tarragona.py", "Tarragona", "🏡"),
             Page("pages/Valencia.py", "Valencia", "🏢"),
             Page("pages/Torrejon.py", "Torrejón", "🏙️"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫")
+            Page("pages/Cordoba.py", "Córdoba", "🏫"),
+            Page("pages/Invitado.py", "Invitado", "🏘️")
         ]
         )
         
@@ -124,7 +125,7 @@ else:
             tab_cons_1, tab_cons_2, tab_cons_3 = st.tabs(["Dashboard", "General", "Detalle"])
 
             with tab_cons_1:
-                st.markdown("Integración de Dashboard de Power BI")
+                st.markdown("Integración de Dashboard")
                 # plot_power_bi_valencia()
                 st.markdown("""---""")
             
@@ -203,10 +204,11 @@ else:
             Page("pages/Tarragona.py", "Tarragona", "🏠"),
             Page("pages/Valencia.py", "Valencia", "🏠"),
             Page("pages/Torrejon.py", "Torrejón", "🏠"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫")
+            Page("pages/Cordoba.py", "Córdoba", "🏫"),
+            Page("pages/Invitado.py", "Invitado", "🏘️")
         ]
         )
-        st.write('You are not authorized to see this property')
+        st.write('No está autorizado a ver esta propiedad')
         st.markdown('<style>' + open('style.css').read() + '</style>', unsafe_allow_html=True)
         
         with st.sidebar:

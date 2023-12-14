@@ -1,0 +1,48 @@
+###
+### A complete description of a Prefect Deployment for flow 'cordoba-connection-flow'
+###
+name: cordoba-connection-flow_deployment
+description: null
+version: prod
+# The work queue that will handle this deployment's runs
+work_queue_name: cordoba_queue
+work_pool_name: cordoba_pool
+tags: []
+parameters: {}
+schedule:
+  cron: '*/2 * * * *'
+  timezone: Europe/Madrid
+  day_or: true
+is_schedule_active: true
+infra_overrides: {}
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: cordoba-connection-flow
+manifest_path: null
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  stream_output: true
+  working_dir: null
+  _block_document_id: 3680c61e-3bab-434c-a4c0-fcf2b8d63878
+  _block_document_name: anonymous-8905045e-06b1-4be0-bb02-4d8c5f8d5fd8
+  _is_anonymous: true
+  block_type_slug: process
+  _block_type_slug: process
+storage: null
+path: /Users/jaimesoroarubio/code/work_projects/Moveam/moveam-web-app
+entrypoint: database/database_connection.py:cordoba_flow
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties: {}
+  required: null
+  definitions: null
+timestamp: '2023-11-22T21:51:11.417068+00:00'
+triggers: []
+enforce_parameter_schema: null

@@ -9,6 +9,7 @@ database/database_connection_prefect.py
 delete_flows.py
 script.js
 tarragona_flow-deployment.yaml
+docker-compose.yml
 
 # OS generated files #
 ######################
@@ -26,3 +27,4 @@ data/
 old/
 documents/
 reference/
+nginx/

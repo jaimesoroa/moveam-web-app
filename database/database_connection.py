@@ -227,7 +227,7 @@ def cups_month():
             months = [f'0{current_month}']
         else:
             months = [current_month]
-    return current_month, months
+    return months
 
 # # Define a daily schedule at 4 AM
 # schedule = schedules.CronSchedule("* * * * *")
@@ -236,7 +236,7 @@ def cups_month():
 # Database connection
 # @task(log_prints=True)
 # Database connection
-def database_connection(cups, username, password, host, database, months, df, response_code):
+def database_connection(cups, username, password, host, database, month, df, response_code):
     url_object = db.URL.create(
         "mysql+mysqldb",
         username=username,
@@ -247,30 +247,26 @@ def database_connection(cups, username, password, host, database, months, df, re
 
     engine = db.create_engine(url_object, pool_pre_ping=True)#, connect_args={'timeout': 15})
     
-    if response_code == 200:
-    
-        # initialize the Metadata Object
-        META_DATA = MetaData()
-        MetaData.reflect(META_DATA, bind= engine)
+    try:
+        if response_code == 200:
+            # Initialize the Metadata Object
+            META_DATA = MetaData()
+            MetaData.reflect(META_DATA, bind=engine)
+            ELECTRICIDAD = META_DATA.tables['ELECTRICIDAD']
 
-        ELECTRICIDAD = META_DATA.tables['ELECTRICIDAD']
-
-        # delete the whole current month, and previous months if neccessary
-        for month in months:
-            dele = ELECTRICIDAD.delete().where(ELECTRICIDAD.c.month == int(month)).where(ELECTRICIDAD.c.cups == cups)
+            # Use a single transaction for all deletions
             with engine.begin() as conn:
+                dele = ELECTRICIDAD.delete().where(ELECTRICIDAD.c.month == int(month)).where(ELECTRICIDAD.c.cups == cups)
                 conn.execute(dele)
-            print(f'Month {month} deleted')
+                print(f'Month {month} deleted')
 
-        # conn.invalidate()
-        conn.close()
-    
-    # Insert whole DataFrame into MySQL (much faster)
-    df.to_sql('ELECTRICIDAD', con = engine, if_exists = 'append', chunksize = 2000,index=False)
-    
-    print('Df written in database')
-    
-    engine.dispose()
+        # Insert whole DataFrame into MySQL
+        df.to_sql('ELECTRICIDAD', con=engine, if_exists='append', chunksize=2000, index=False)
+        print('DataFrame written in database')
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        engine.dispose()
     
     return None
 
@@ -279,24 +275,21 @@ def database_connection(cups, username, password, host, database, months, df, re
 @task(log_prints=True)
 def consumption(months, cups_list, headers_moveam, username, password, host, database):
     # Create the list of lists of consumptions
-    df = pd.DataFrame(columns=['cups', 'date', 'time', 'consumptionKWh', 'obtainMethod', 'surplusEnergyKWh'])
-    column_names= df.columns
-    consumption= [column_names]
-    cups = cups_list
+    # df = pd.DataFrame(columns=['cups', 'date', 'time', 'consumptionKWh', 'obtainMethod', 'surplusEnergyKWh'])
+    # column_names= df.columns
+    # consumption= [column_names]
     status_code_list = []
     current_year = datetime.today().strftime('%Y')
     previous_year = str(int(current_year)-1)
-    current_date = datetime.today().strftime('%Y-%m-%d')
-    current_hour = datetime.today().strftime('%H:%M:%S')
+    # current_date = datetime.today().strftime('%Y-%m-%d')
+    # current_hour = datetime.today().strftime('%H:%M:%S')
     current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M')
+    all_data = []
     for month in months:
-        if len(months) == 2 and month == months[0] and month == '12':
-            year = previous_year
-        else:
-            year = current_year
-        for i in range(len(cups)):
+        year = previous_year if len(months) == 2 and month == months[0] and month == '12' else current_year
+        for cups in cups_list:
             consumption_params = {
-            "cups": cups[i],
+            "cups": cups,
             "distributorCode": "2",
             "startDate": f'{year}/{month}',
             "endDate": f'{year}/{month}',
@@ -306,39 +299,56 @@ def consumption(months, cups_list, headers_moveam, username, password, host, dat
             "authorizedNif": 'B88590583'
             }
             # API request
-            consumption_response = requests.get("https://datadis.es/api-private/api/get-consumption-data", params= consumption_params, headers= headers_moveam)
+            response = requests.get("https://datadis.es/api-private/api/get-consumption-data", params= consumption_params, headers= headers_moveam)
             # Only use valid responses
-            response_code = consumption_response.status_code
-            status_code_list.append(response_code)
-            if response_code == 200 and len(consumption_response.text) > 3:
-                response_text = consumption_response.text
-                # Remove nulls from text to avoid errors
-                response_text = response_text.replace("null", "None")
-                # Create a list of lists
-                dict_list = eval(response_text)
-                df = pd.DataFrame(dict_list)
-                df = df.drop(columns= ['obtainMethod', 'surplusEnergyKWh'])
+            status_code_list.append(response.status_code)
+            
+            if response.status_code == 200 and len(response.text) > 3:
+                data = response.json()  # Use json() instead of eval
+                df = pd.DataFrame(data, index= None).drop(columns=['obtainMethod', 'surplusEnergyKWh'])
                 df['month'] = pd.to_datetime(df['date']).dt.month
                 df['lastUpdated'] = current_datetime
-                
-                database_connection(cups[i], username, password, host, database, months, df, response_code)
             else:
-                df = pd.DataFrame([[cups[i], current_date, current_hour, consumption_response.status_code, month, current_datetime]],
-                  columns= ['cups', 'date', 'time', 'consumptionKWh', 'month', 'lastUpdated'])
-                database_connection(cups[i], username, password, host, database, months, df, response_code)
+                df = pd.DataFrame([[cups, datetime.today().strftime('%Y-%m-%d'), datetime.today().strftime('%H:%M:%S'), response.status_code, month, current_datetime]],
+                                  columns=['cups', 'date', 'time', 'consumptionKWh', 'month', 'lastUpdated'])
+
+            all_data.append(df)
+            database_connection(cups, username, password, host, database, month, df, response.status_code)
+
+    final_df = pd.concat(all_data)
+
+            
+    #         if response.status_code == 200 and len(response.text) > 3:
+    #             response_text = response.text
+    #             # Remove nulls from text to avoid errors
+    #             response_text = response_text.replace("null", "None")
+    #             # Create a list of lists
+    #             dict_list = eval(response_text)
+    #             df = pd.DataFrame(dict_list)
+    #             df = df.drop(columns= ['obtainMethod', 'surplusEnergyKWh'])
+    #             df['month'] = pd.to_datetime(df['date']).dt.month
+    #             df['lastUpdated'] = current_datetime
                 
-                # res = df.values.tolist()
-                # res.insert(0, list(df.columns))
-                # consumption.extend(res[1:])
-    # Modify the resulting dataframe to use first row as columns and remove and add columns
-    # consumption_df = pd.DataFrame(consumption)
-    # consumption_df.columns = consumption_df.iloc[0]
-    # consumption_df = consumption_df[1:]
-    # consumption_df = consumption_df.drop(columns= ['obtainMethod', 'surplusEnergyKWh'])
-    # consumption_df['month'] = pd.to_datetime(consumption_df['date']).dt.month
-    # consumption_df['lastUpdated'] = datetime.today().strftime('%Y-%m-%d %H:%M')
+    #             database_connection(cups, username, password, host, database, month, df, response.status_code)
+    #         else:
+    #             df = pd.DataFrame([[cups, current_date, current_hour, response.status_code, month, current_datetime]],
+    #               columns= ['cups', 'date', 'time', 'consumptionKWh', 'month', 'lastUpdated'])
+    #             database_connection(cups, username, password, host, database, month, df, response.status_code)
+                
+    #             # res = df.values.tolist()
+    #             # res.insert(0, list(df.columns))
+    #             # consumption.extend(res[1:])
+    # # Modify the resulting dataframe to use first row as columns and remove and add columns
+    # # consumption_df = pd.DataFrame(consumption)
+    # # consumption_df.columns = consumption_df.iloc[0]
+    # # consumption_df = consumption_df[1:]
+    # # consumption_df = consumption_df.drop(columns= ['obtainMethod', 'surplusEnergyKWh'])
+    # # consumption_df['month'] = pd.to_datetime(consumption_df['date']).dt.month
+    # # consumption_df['lastUpdated'] = datetime.today().strftime('%Y-%m-%d %H:%M')
     
-    return df, status_code_list
+    # return df, status_code_list
+
+    return final_df
 
 
 @flow(name="cordoba-connection-flow", log_prints=True)
@@ -351,12 +361,10 @@ def cordoba_flow():
     
     cups_list = whole_cups_list(supplies_response)
 
-    (current_month, months) = cups_month()
+    months = cups_month()
     
     consumption_df = consumption(months, cups_list, headers_moveam, database_secrets['username'], database_secrets['password'], 
         database_secrets['host'], database_secrets['dbname_cordoba'])
-    # database_connection(database_secrets['username'], database_secrets['password'], 
-    #     database_secrets['host'], database_secrets['dbname_cordoba'], months, consumption_df)
     
     return consumption_df
     
@@ -394,7 +402,7 @@ if __name__ == "__main__":
     # asyncio.run(cloud_connection(prefect_api_url, prefect_api_key, prefect_tenant_id, cordoba_flow))
 
     # Run the Prefect flow
-    cordoba_deploy= cordoba_flow.to_deployment(name="cordoba-first-deployment", cron= '30 11 * * *')#, work_pool_name= 'cordoba_pool', work_queue_name= 'cordoba_queue')
+    cordoba_deploy= cordoba_flow.to_deployment(name="cordoba-first-deployment", cron= '00 11 * * *')#, work_pool_name= 'cordoba_pool', work_queue_name= 'cordoba_queue')
     serve(cordoba_deploy)
     
     # To serve several flows at once:

@@ -297,20 +297,23 @@ def consumption(months, cups_list, headers_moveam, username, password, host, dat
             "authorizedNif": 'B88590583'
             }
             # API request
-            response = requests.get("https://datadis.es/api-private/api/get-consumption-data", params= consumption_params, headers= headers_moveam)
-            # Only use valid responses
-            status_code_list.append(response.status_code)
-            
+            try:
+                response = requests.get("https://datadis.es/api-private/api/get-consumption-data", params= consumption_params, headers= headers_moveam)
+                status_code_list.append(response.status_code)            
+            except Exception as e:
+                print(f"An error occurred: {e}")
+            # Only use valid responses            
             if response.status_code == 200 and len(response.text) > 3:
                 data = response.json()  # Use json() instead of eval
                 df = pd.DataFrame(data, index= None).drop(columns=['obtainMethod', 'surplusEnergyKWh'])
                 df['month'] = pd.to_datetime(df['date']).dt.month
                 df['lastUpdated'] = current_datetime
+            # We remove the option of recording all the status codes in the database
             # else:
             #     df = pd.DataFrame([[cups, datetime.today().strftime('%Y-%m-%d'), datetime.today().strftime('%H:%M:%S'), response.status_code, month, current_datetime]],
             #                       columns=['cups', 'date', 'time', 'consumptionKWh', 'month', 'lastUpdated'])
                 database_connection(cups, username, password, host, database, month, df, response.status_code)
-            all_data.append(df)
+                all_data.append(df)
             
 
     final_df = pd.concat(all_data)

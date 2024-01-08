@@ -191,15 +191,15 @@ def whole_cups_list(supplies_response):
     for supply in supplies_response_dict:
         cups_list.append(supply['cups'])
     # Temporary list of common areas CUPS to avoid requesting the whole list without authorization
-    cups_zzcc = ['ES0031105565704002KT0F', 'ES0031105565704001CE0F', 
-                 'ES0031105565708002XK0F', 'ES0031105565704017KS0F', 
-                 'ES0031105565670001ZQ0F', 'ES0031105565670002ZV0F', 
-                 'ES0031105565707001JD0F', 'ES0031105531573042AM0F', 
-                 'ES0031105531573040AA0F', 'ES0031105565672001DS0F', 
-                 'ES0031105565705001HX0F', 'ES0031105531571040PG0F', 
-                 'ES0031105531571041PM0F', 'ES0031105531573041AG0F', 
-                 'ES0031105531571042PY0F']
-    cups_list = cups_zzcc
+    # cups_zzcc = ['ES0031105565704002KT0F', 'ES0031105565704001CE0F', 
+    #              'ES0031105565708002XK0F', 'ES0031105565704017KS0F', 
+    #              'ES0031105565670001ZQ0F', 'ES0031105565670002ZV0F', 
+    #              'ES0031105565707001JD0F', 'ES0031105531573042AM0F', 
+    #              'ES0031105531573040AA0F', 'ES0031105565672001DS0F', 
+    #              'ES0031105565705001HX0F', 'ES0031105531571040PG0F', 
+    #              'ES0031105531571041PM0F', 'ES0031105531573041AG0F', 
+    #              'ES0031105531571042PY0F']
+    # cups_list = cups_zzcc
     
     return cups_list
 
@@ -207,13 +207,11 @@ def whole_cups_list(supplies_response):
 def cups_month():
     current_month = datetime.today().strftime('%m')
     current_day = datetime.today().strftime('%d')
-    # current_month = '6'
-    # current_day = '17'
-    if current_month == '1':
+    if current_month == '01':
         previous_month = '12'
     else:
         previous_month = str(int(current_month)-1)
-    if int(current_day) < 3:
+    if int(current_day) <= 3:
         if len(current_month) == 1 and len(previous_month) == 1:
             months = [f'0{previous_month}',f'0{current_month}']
         elif len(current_month) > 1 and len(previous_month) == 1:
@@ -308,12 +306,12 @@ def consumption(months, cups_list, headers_moveam, username, password, host, dat
                 df = pd.DataFrame(data, index= None).drop(columns=['obtainMethod', 'surplusEnergyKWh'])
                 df['month'] = pd.to_datetime(df['date']).dt.month
                 df['lastUpdated'] = current_datetime
-            else:
-                df = pd.DataFrame([[cups, datetime.today().strftime('%Y-%m-%d'), datetime.today().strftime('%H:%M:%S'), response.status_code, month, current_datetime]],
-                                  columns=['cups', 'date', 'time', 'consumptionKWh', 'month', 'lastUpdated'])
-
+            # else:
+            #     df = pd.DataFrame([[cups, datetime.today().strftime('%Y-%m-%d'), datetime.today().strftime('%H:%M:%S'), response.status_code, month, current_datetime]],
+            #                       columns=['cups', 'date', 'time', 'consumptionKWh', 'month', 'lastUpdated'])
+                database_connection(cups, username, password, host, database, month, df, response.status_code)
             all_data.append(df)
-            database_connection(cups, username, password, host, database, month, df, response.status_code)
+            
 
     final_df = pd.concat(all_data)
 

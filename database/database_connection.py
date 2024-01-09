@@ -308,10 +308,13 @@ def consumption(months, cups_list, headers_moveam, username, password, host, dat
                 df = pd.DataFrame(data, index= None).drop(columns=['obtainMethod', 'surplusEnergyKWh'])
                 df['month'] = pd.to_datetime(df['date']).dt.month
                 df['lastUpdated'] = current_datetime
+                df.drop_duplicates(inplace=True)
+                
             # We remove the option of recording all the status codes in the database
             # else:
             #     df = pd.DataFrame([[cups, datetime.today().strftime('%Y-%m-%d'), datetime.today().strftime('%H:%M:%S'), response.status_code, month, current_datetime]],
             #                       columns=['cups', 'date', 'time', 'consumptionKWh', 'month', 'lastUpdated'])
+            
                 database_connection(cups, username, password, host, database, month, df, response.status_code)
                 all_data.append(df)
             

@@ -79,7 +79,8 @@ authenticator = stauth.Authenticate(
 st.session_state['authenticator'] = authenticator
 
 # Render the login widget by providing a name for the form and its location (i.e., sidebar or main)
-name, authentication_status, username = authenticator.login('Login', 'main')
+# name, authentication_status, username = authenticator.login('Login', 'main')
+name, authentication_status, username = authenticator.login('main')
 
 st.session_state['authentication_status'] = authentication_status
 st.session_state['username'] = username
@@ -165,6 +166,9 @@ st.session_state['powerbi_cordoba_id'] = powerbi_secrets['powerbi_cordoba_id']
 st.session_state['powerbi_valdemoro_title'] = powerbi_secrets['powerbi_valdemoro_title']
 st.session_state['powerbi_valdemoro_source'] = powerbi_secrets['powerbi_valdemoro_source']
 st.session_state['powerbi_valdemoro_id'] = powerbi_secrets['powerbi_valdemoro_id']
+st.session_state['powerbi_stay_title'] = powerbi_secrets['powerbi_stay_title']
+st.session_state['powerbi_stay_source'] = powerbi_secrets['powerbi_stay_source']
+st.session_state['powerbi_stay_id'] = powerbi_secrets['powerbi_stay_id']
 
 
 # Load configuration
@@ -255,6 +259,7 @@ if authentication_status:
     show_pages(
         [
             Page("Home.py", "Home", ":computer:"),
+            Page("pages/Stay.py", "Stay", "🏡"),
             Page("pages/Tarragona.py", "Tarragona", "🏡"),
             Page("pages/Valencia.py", "Valencia", "🏢"),
             Page("pages/Torrejon.py", "Torrejón", "🏙️"),
@@ -324,9 +329,14 @@ if authentication_status:
 
         st.markdown("""---""")
 
-        tab_prop_1, tab_prop_2, tab_prop_3, tab_prop_4, tab_prop_5 = st.tabs(["Tarragona", "Valencia", "Torrejón", "Córdoba", "Invitado"])
+        tab_prop_1, tab_prop_2, tab_prop_3, tab_prop_4, tab_prop_5, tab_prop_6 = st.tabs(["Stay", "Tarragona", "Valencia", "Torrejón", "Córdoba", "Invitado"])
 
         with tab_prop_1:
+            stay_analitica = st.button('Ir a la página de centralización de propiedades de Stay', key = 'stay_analitica')
+            if stay_analitica:
+                switch_page('Stay')
+        
+        with tab_prop_2:
             # st.metric(label="Consumo de energía del último mes", value="18.500 kWh", delta="+2%")
             # st.markdown("Información de la propiedad")
             tarragona_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'tarragona_analitica')
@@ -339,25 +349,25 @@ if authentication_status:
             # st.map(map_data)
             st.markdown("""---""")
             
-        with tab_prop_2:
+        with tab_prop_3:
             # st.markdown("Información")
             valencia_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'valencia_analitica')
             if valencia_analitica:
                 switch_page('Valencia')
 
-        with tab_prop_3:
+        with tab_prop_4:
             # st.markdown("Información")
             torrejon_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'torrejon_analitica')
             if torrejon_analitica:
                 switch_page('Torrejón')
         
-        with tab_prop_4:
+        with tab_prop_5:
             # st.markdown("Información")
             cordoba_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'cordoba_analitica')
             if cordoba_analitica:
                 switch_page('Córdoba')
         
-        with tab_prop_5:
+        with tab_prop_6:
             # st.markdown("Información")
             invitado_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'invitado_analitica')
             if invitado_analitica:

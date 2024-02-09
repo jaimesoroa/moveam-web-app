@@ -2,7 +2,7 @@ numpy
 pandas
 matplotlib
 seaborn
-streamlit
+streamlit==1.28.1
 watchdog
 streamlit-on-Hover-tabs
 datetime
@@ -10,7 +10,7 @@ datetime
 # requests
 # os
 python-dotenv
-streamlit-authenticator
+streamlit-authenticator==0.2.3
 pyyaml
 st_pages
 streamlit_extras

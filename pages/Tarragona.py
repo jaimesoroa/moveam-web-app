@@ -104,6 +104,7 @@ else:
         show_pages(
         [
             Page("Home.py", "Home", ":computer:"),
+            Page("pages/Stay.py", "Stay", "🏡"),
             Page("pages/Tarragona.py", "Tarragona", "🏡"),
             Page("pages/Valencia.py", "Valencia", "🏢"),
             Page("pages/Torrejon.py", "Torrejón", "🏙️"),
@@ -330,6 +331,7 @@ else:
         show_pages(
         [
             Page("Home.py", "Home", ":computer:"),
+            Page("pages/Stay.py", "Stay", "🏡"),
             Page("pages/Tarragona.py", "Tarragona", "🏠"),
             Page("pages/Valencia.py", "Valencia", "🏠"),
             Page("pages/Torrejon.py", "Torrejón", "🏠"),

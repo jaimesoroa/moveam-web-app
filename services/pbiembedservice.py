@@ -26,16 +26,24 @@ class PbiEmbedService:
         '''
 
         report_url = f'https://api.powerbi.com/v1.0/myorg/groups/{workspace_id}/reports/{report_id}'       
-        api_response = requests.get(report_url, headers=self.get_request_header())
+        try:
+            api_response = requests.get(report_url, headers=self.get_request_header())
+            # print(f'Status code of the get_embed_params_for_single_report request: {api_response.status_code}')
+            # print(f'{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
 
-        if api_response.status_code != 200:
+        # if api_response.status_code != 200:
             # abort(api_response.status_code, description=f'Error while retrieving Embed URL\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
             # Replace the previous Flask abort command with a new one
-            print(api_response.status_code, f'Error while retrieving Embed URL\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
+            # print(api_response.status_code, f'Error while retrieving Embed URL\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
 
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            print(api_response.status_code, f'Error while retrieving Embed URL\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
+        
         api_response = json.loads(api_response.text)
         report = ReportConfig(api_response['id'], api_response['name'], api_response['embedUrl'])
         dataset_ids = [api_response['datasetId']]
+        # print(f'dataset_id = {dataset_ids}')
 
         # Append additional dataset to the list to achieve dynamic binding later
         if additional_dataset_id is not None:
@@ -67,12 +75,18 @@ class PbiEmbedService:
 
         for report_id in report_ids:
             report_url = f'https://api.powerbi.com/v1.0/myorg/groups/{workspace_id}/reports/{report_id}'
-            api_response = requests.get(report_url, headers=self.get_request_header())
+            try:
+                api_response = requests.get(report_url, headers=self.get_request_header())
 
-            if api_response.status_code != 200:
+            # if api_response.status_code != 200:
                 # abort(api_response.status_code, description=f'Error while retrieving Embed URL\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
                 # Replace the previous Flask abort command with a new one
+                # print(api_response.status_code, f'Error while retrieving Embed URL\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
+
+            except Exception as e:
+                print(f"An error occurred: {e}")
                 print(api_response.status_code, f'Error while retrieving Embed URL\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
+        
 
             api_response = json.loads(api_response.text)
             report_config = ReportConfig(api_response['id'], api_response['name'], api_response['embedUrl'])
@@ -111,11 +125,18 @@ class PbiEmbedService:
 
         # Generate Embed token for multiple workspaces, datasets, and reports. Refer https://aka.ms/MultiResourceEmbedToken
         embed_token_api = 'https://api.powerbi.com/v1.0/myorg/GenerateToken'
-        api_response = requests.post(embed_token_api, data=json.dumps(request_body.__dict__), headers=self.get_request_header())
+        try:
+            api_response = requests.post(embed_token_api, data=json.dumps(request_body.__dict__), headers=self.get_request_header())
+            # print(f'Status code of the get_embed_token_for_single_report_single_workspace request: {api_response.status_code}')
+            # print(f'{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
 
-        if api_response.status_code != 200:
-            abort(api_response.status_code, description=f'Error while retrieving Embed token\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
+        # if api_response.status_code != 200:
+        #     print(api_response.status_code, f'Error while retrieving Embed URL\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
 
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            print(api_response.status_code, f'Error while retrieving Embed URL\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
+        
         api_response = json.loads(api_response.text)
         embed_token = EmbedToken(api_response['tokenId'], api_response['token'], api_response['expiration'])
         return embed_token
@@ -147,12 +168,18 @@ class PbiEmbedService:
 
         # Generate Embed token for multiple workspaces, datasets, and reports. Refer https://aka.ms/MultiResourceEmbedToken
         embed_token_api = 'https://api.powerbi.com/v1.0/myorg/GenerateToken'
-        api_response = requests.post(embed_token_api, data=json.dumps(request_body.__dict__), headers=self.get_request_header())
+        try:
+            api_response = requests.post(embed_token_api, data=json.dumps(request_body.__dict__), headers=self.get_request_header())
 
-        if api_response.status_code != 200:
-            abort(api_response.status_code, description=f'Error while retrieving Embed token\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
+        # if api_response.status_code != 200:
+        #     print(api_response.status_code, description=f'Error while retrieving Embed token\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
         
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            print(api_response.status_code, f'Error while retrieving Embed URL\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
+                
         api_response = json.loads(api_response.text)
+        print(api_response)
         embed_token = EmbedToken(api_response['tokenId'], api_response['token'], api_response['expiration'])
         return embed_token
 
@@ -184,11 +211,17 @@ class PbiEmbedService:
 
         # Generate Embed token for multiple workspaces, datasets, and reports. Refer https://aka.ms/MultiResourceEmbedToken
         embed_token_api = 'https://api.powerbi.com/v1.0/myorg/GenerateToken'
-        api_response = requests.post(embed_token_api, data=json.dumps(request_body.__dict__), headers=self.get_request_header())
+        
+        try:
+            api_response = requests.post(embed_token_api, data=json.dumps(request_body.__dict__), headers=self.get_request_header())
 
-        if api_response.status_code != 200:
-            abort(api_response.status_code, description=f'Error while retrieving Embed token\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
+        # if api_response.status_code != 200:
+        #     abort(api_response.status_code, description=f'Error while retrieving Embed token\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
 
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            print(api_response.status_code, f'Error while retrieving Embed URL\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
+        
         api_response = json.loads(api_response.text)
         embed_token = EmbedToken(api_response['tokenId'], api_response['token'], api_response['expiration'])
         return embed_token

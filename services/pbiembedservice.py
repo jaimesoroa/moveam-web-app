@@ -25,7 +25,7 @@ class PbiEmbedService:
             EmbedConfig: Embed token and Embed URL
         '''
 
-        report_url = f'https://api.powerbi.com/v1.0/myorg/groups/{workspace_id}/reports/{report_id}'       
+        report_url = f'https://api.powerbi.com/v1.0/myorg/groups/{workspace_id}/reports/{report_id}'
         try:
             api_response = requests.get(report_url, headers=self.get_request_header())
             # print(f'Status code of the get_embed_params_for_single_report request: {api_response.status_code}')
@@ -43,11 +43,12 @@ class PbiEmbedService:
         api_response = json.loads(api_response.text)
         report = ReportConfig(api_response['id'], api_response['name'], api_response['embedUrl'])
         dataset_ids = [api_response['datasetId']]
-        # print(f'dataset_id = {dataset_ids}')
+        print(f'The dataset_id is: {dataset_ids}')
 
         # Append additional dataset to the list to achieve dynamic binding later
         if additional_dataset_id is not None:
-            dataset_ids.append(additional_dataset_id)
+            dataset_ids.extend(additional_dataset_id)
+        print(f'The dataset_ids are: {dataset_ids}')
 
         embed_token = self.get_embed_token_for_single_report_single_workspace(report_id, dataset_ids, workspace_id)
         # print(embed_token.token)
@@ -138,6 +139,7 @@ class PbiEmbedService:
             print(api_response.status_code, f'Error while retrieving Embed URL\n{api_response.reason}:\t{api_response.text}\nRequestId:\t{api_response.headers.get("RequestId")}')
         
         api_response = json.loads(api_response.text)
+        print(f'The api response is: {api_response}')
         embed_token = EmbedToken(api_response['tokenId'], api_response['token'], api_response['expiration'])
         return embed_token
 

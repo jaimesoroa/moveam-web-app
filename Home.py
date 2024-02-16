@@ -169,6 +169,7 @@ st.session_state['powerbi_valdemoro_id'] = powerbi_secrets['powerbi_valdemoro_id
 st.session_state['powerbi_stay_title'] = powerbi_secrets['powerbi_stay_title']
 st.session_state['powerbi_stay_source'] = powerbi_secrets['powerbi_stay_source']
 st.session_state['powerbi_stay_id'] = powerbi_secrets['powerbi_stay_id']
+st.session_state['powerbi_stay_additional_dataset'] = powerbi_secrets['powerbi_stay_additional_dataset']
 
 
 # Load configuration

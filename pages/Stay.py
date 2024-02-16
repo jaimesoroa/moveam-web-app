@@ -75,8 +75,9 @@ else:
         # System variables
 
         WORKSPACE_ID = st.session_state['power_bi_moveam_wokspace_id']
-        # REPORT_ID = st.session_state['powerbi_stay_id']
-        REPORT_IDS = [st.session_state['powerbi_stay_id'], st.session_state['powerbi_tarragona_id'], st.session_state['powerbi_cordoba_id']]
+        REPORT_ID = st.session_state['powerbi_stay_id']
+        ADDITIONAL_DATASET = st.session_state['powerbi_stay_additional_dataset']
+        # REPORT_IDS = [st.session_state['powerbi_stay_id'], st.session_state['powerbi_tarragona_id'], st.session_state['powerbi_cordoba_id']]
         
         # ===============================================================================================================
         # Functions
@@ -98,8 +99,8 @@ else:
         # @st.cache_resource
         def plot_power_bi_stay():
             # return st.markdown(f'<iframe title= {POWER_BI_TARRAGONA_TITLE} width="1140" height="541.25" src={POWER_BI_TARRAGONA_SRC} frameborder="0" allowFullScreen="true"></iframe>', unsafe_allow_html=True)
-            # embed_info = PbiEmbedService().get_embed_params_for_single_report(WORKSPACE_ID, REPORT_ID)
-            embed_info = PbiEmbedService().get_embed_params_for_multiple_reports(WORKSPACE_ID, REPORT_IDS)
+            embed_info = PbiEmbedService().get_embed_params_for_single_report(WORKSPACE_ID, REPORT_ID)#, ADDITIONAL_DATASET)
+            # embed_info = PbiEmbedService().get_embed_params_for_multiple_reports(WORKSPACE_ID, REPORT_IDS)
             api_response_json = json.dumps(embed_info)
             
             html_code = f'''

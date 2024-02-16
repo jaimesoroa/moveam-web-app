@@ -13,6 +13,7 @@ from prefect import task, flow, serve#, get_client
 # from prefect.client.cloud import CloudClient
 from prefect.client.orchestration import PrefectClient
 # from prefect.schedules import CronSchedule
+import json
 
 # Get the parent directory
 # parent_dir = os.path.dirname(os.path.realpath(__file__))
@@ -101,7 +102,7 @@ def get_secret_datadis():
     # Decrypts secret using the associated KMS key.
     secret = get_secret_value_response['SecretString']
 
-    return eval(secret)
+    return json.loads(secret)
 
 # AWS secrets Database
 @task(log_prints=True)
@@ -129,7 +130,7 @@ def get_secrets_database():
     # Decrypts secret using the associated KMS key.
     secret = get_secret_value_response['SecretString']
     
-    return eval(secret)
+    return json.loads(secret)
 
 # AWS secrets Prefect
 # @task(log_prints=True)
@@ -158,7 +159,7 @@ def get_secrets_prefect():
     # Decrypts secret using the associated KMS key.
     secret = get_secret_value_response['SecretString']
 
-    return eval(secret)
+    return json.loads(secret)
 
 # ==============================================================================================
 # Datadis connection
@@ -187,20 +188,9 @@ def datadis_connection(username, password, authorized_nif):
 @task(log_prints=True)
 def whole_cups_list(supplies_response):
     cups_list= []
-    supplies_response_dict = eval(supplies_response.text)
+    supplies_response_dict = json.loads(supplies_response.text)
     for supply in supplies_response_dict:
         cups_list.append(supply['cups'])
-    # Temporary list of common areas CUPS to avoid requesting the whole list without authorization
-    # cups_zzcc = ['ES0031105565704002KT0F', 'ES0031105565704001CE0F', 
-    #              'ES0031105565708002XK0F', 'ES0031105565704017KS0F', 
-    #              'ES0031105565670001ZQ0F', 'ES0031105565670002ZV0F', 
-    #              'ES0031105565707001JD0F', 'ES0031105531573042AM0F', 
-    #              'ES0031105531573040AA0F', 'ES0031105565672001DS0F', 
-    #              'ES0031105565705001HX0F', 'ES0031105531571040PG0F', 
-    #              'ES0031105531571041PM0F', 'ES0031105531573041AG0F', 
-    #              'ES0031105531571042PY0F']
-    # cups_list = cups_zzcc
-    
     return cups_list
 
 @task(log_prints=True)
@@ -227,13 +217,9 @@ def cups_month():
             months = [current_month]
     return months
 
-# # Define a daily schedule at 4 AM
-# schedule = schedules.CronSchedule("* * * * *")
-
 # ==============================================================================================
 # Database connection
 # @task(log_prints=True)
-# Database connection
 def database_connection(cups, username, password, host, database, month, df, year):
     url_object = db.URL.create(
         "mysql+mysqldb",
@@ -253,16 +239,75 @@ def database_connection(cups, username, password, host, database, month, df, yea
         
         # Use a single transaction for all deletions
         with engine.begin() as conn:
-            dele = ELECTRICIDAD.delete().where(ELECTRICIDAD.c.month == int(month)).where(ELECTRICIDAD.c.cups == cups).where(ELECTRICIDAD.c.year == int(year))
-            conn.execute(dele)
-            print(f'Month {month} deleted')
-            
-        # Insert whole DataFrame into MySQL
-        df.drop_duplicates(subset=['cups', 'date', 'time', 'month', 'year'], keep='last', inplace=True, ignore_index=True)
-        df.to_sql('ELECTRICIDAD', con=engine, if_exists='append', chunksize=2000, index=False)
-        print('DataFrame written in database')
+            # Check if there has already been an update today.
+            sql = f'select * from ELECTRICIDAD where month = {month} and year = {year} and cups = "{cups}"'
+            df = pd.read_sql(sql,con=engine)
+            if len(df) == 0 or (df['lastUpdated'][0].strftime('%Y-%m-%d') != datetime.today().strftime('%Y-%m-%d')):
+                # Delete the previously updated month (before today)
+                dele = ELECTRICIDAD.delete().where(ELECTRICIDAD.c.month == int(month)).where(ELECTRICIDAD.c.cups == cups).where(ELECTRICIDAD.c.year == int(year))
+                conn.execute(dele)
+                print(f'Month {month} deleted for CUPS {cups} at {datetime.today().strftime("%Y-%m-%d %H:%M:%S.%f")}')
+                
+                # Insert whole DataFrame into MySQL
+                df.drop_duplicates(subset=['cups', 'date', 'time', 'month', 'year'], keep='last', inplace=True, ignore_index=True)
+                df.to_sql('ELECTRICIDAD', con=engine, if_exists='append', chunksize=2000, index=False)
+                print(f'DataFrame from CUPS {cups} and month {month} written in database at {datetime.today().strftime("%Y-%m-%d %H:%M:%S.%f")}')
+            else:
+                print(f'CUPS {cups} has already been updated at {datetime.today().strftime("%Y-%m-%d")}')
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An error occurred for CUPS {cups} when trying to delete and write in database: {e}")
+    finally:
+        engine.dispose()
+    
+    return None
+
+def database_month_deletion(month_cups_list, username, password, host, database, month, year):
+    url_object = db.URL.create(
+        "mysql+mysqldb",
+        username=username,
+        password=password,
+        host=host,
+        database=database,
+    )
+
+    engine = db.create_engine(url_object, pool_pre_ping=True)
+    
+    try:
+        for cups in month_cups_list:
+            META_DATA = MetaData()
+            MetaData.reflect(META_DATA, bind=engine)
+            ELECTRICIDAD = META_DATA.tables['ELECTRICIDAD']
+            # Use a single transaction for all deletions
+            with engine.begin() as conn:
+                dele = ELECTRICIDAD.delete().where(ELECTRICIDAD.c.month == int(month)).where(ELECTRICIDAD.c.year == int(year)).where(ELECTRICIDAD.c.cups == cups)
+                conn.execute(dele)
+            # engine.dispose()
+    except Exception as e:
+        print(f"An error occurred for CUPS {cups}, month {month} and year {year} when trying to delete in database: {e}")
+    finally:
+        engine.dispose()
+    
+    return None
+
+def database_writing(username, password, host, database, month, df, year):
+    url_object = db.URL.create(
+        "mysql+mysqldb",
+        username=username,
+        password=password,
+        host=host,
+        database=database,
+    )
+
+    engine = db.create_engine(url_object, pool_pre_ping=True)
+    
+    try:
+        # Use a single transaction for all deletions
+        with engine.begin() as conn:
+                # Insert whole DataFrame into MySQL
+                df.to_sql('ELECTRICIDAD', con=engine, if_exists='append', chunksize=2000, index=False)
+                print(f'DataFrame from month {month} and year {year} written in database at {datetime.today().strftime("%Y-%m-%d %H:%M:%S.%f")}')
+    except Exception as e:
+        print(f"An error occurred for month {month} and year {year} when trying to write in database: {e}")
     finally:
         engine.dispose()
     
@@ -277,6 +322,7 @@ def consumption(months, cups_list, headers_moveam, username, password, host, dat
     previous_year = str(int(current_year)-1)
     all_data = []
     for month in months:
+        month_data = []
         year = previous_year if len(months) == 2 and month == months[0] and month == '12' else current_year
         for cups in cups_list:
             consumption_params = {
@@ -293,8 +339,9 @@ def consumption(months, cups_list, headers_moveam, username, password, host, dat
             try:
                 response = requests.get("https://datadis.es/api-private/api/get-consumption-data", params= consumption_params, headers= headers_moveam)
                 status_code_list.append(response.status_code)
+                print(f'CUPS {cups} has a response code of {response.status_code}')
             except Exception as e:
-                print(f"An error occurred: {e}")
+                print(f"An error occurred for CUPS {cups}: {e}")
             # Only use valid responses            
             if response.status_code == 200 and len(response.text) > 3:
                 # Extract the response data and create a dataframe
@@ -307,13 +354,26 @@ def consumption(months, cups_list, headers_moveam, username, password, host, dat
                 # df.drop_duplicates(inplace=True)
                 
                 # Write the dataframe in the MySQL database
-                database_connection(cups, username, password, host, database, month, df, year)
+                # database_connection(cups, username, password, host, database, month, df, year)
                 
                 # Include the dataframe in a list of dataframe for when we need to check the function
                 all_data.append(df)
+                month_data.append(df)
+                
+        if len(month_data) > 0:
+            month_df = pd.concat(month_data)
+            month_df.drop_duplicates(subset=['cups', 'date', 'time', 'month', 'year'], keep='last', inplace=True, ignore_index=True)
+            month_cups_list = month_df['cups'].unique()
+            database_month_deletion(month_cups_list, username, password, host, database, month, year)
             
 
-    final_df = pd.concat(all_data)
+    if len(all_data) > 0:
+        final_df = pd.concat(all_data)
+        final_df.drop_duplicates(subset=['cups', 'date', 'time', 'month', 'year'], keep='last', inplace=True, ignore_index=True)
+    else:
+        final_df = pd.DataFrame()
+    
+    database_writing(username, password, host, database, month, final_df, year)
     
     return final_df
 

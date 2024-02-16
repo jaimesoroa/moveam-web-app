@@ -340,29 +340,27 @@ def consumption(months, cups_list, headers_moveam, username, password, host, dat
                 response = requests.get("https://datadis.es/api-private/api/get-consumption-data", params= consumption_params, headers= headers_moveam)
                 status_code_list.append(response.status_code)
                 print(f'CUPS {cups} has a response code of {response.status_code}')
+
+                # Only use valid responses            
+                if response.status_code == 200 and len(response.text) > 3:
+                    # Extract the response data and create a dataframe
+                    data = response.json()  # Use json() instead of eval
+                    df = pd.DataFrame(data, index= None).drop(columns=['obtainMethod', 'surplusEnergyKWh'])
+                    df['month'] = pd.to_datetime(df['date']).dt.month
+                    df['year'] = pd.to_datetime(df['date']).dt.year
+                    current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S.%f')
+                    df['lastUpdated'] = current_datetime
+
+                    # Include the dataframe in a list of dataframes to use later to write in the database
+                    all_data.append(df)
+                    month_data.append(df)
+                
             except Exception as e:
                 print(f"An error occurred for CUPS {cups}: {e}")
-            # Only use valid responses            
-            if response.status_code == 200 and len(response.text) > 3:
-                # Extract the response data and create a dataframe
-                data = response.json()  # Use json() instead of eval
-                df = pd.DataFrame(data, index= None).drop(columns=['obtainMethod', 'surplusEnergyKWh'])
-                df['month'] = pd.to_datetime(df['date']).dt.month
-                df['year'] = pd.to_datetime(df['date']).dt.year
-                current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S.%f')
-                df['lastUpdated'] = current_datetime
-                # df.drop_duplicates(inplace=True)
-                
-                # Write the dataframe in the MySQL database
-                # database_connection(cups, username, password, host, database, month, df, year)
-                
-                # Include the dataframe in a list of dataframe for when we need to check the function
-                all_data.append(df)
-                month_data.append(df)
                 
         if len(month_data) > 0:
             month_df = pd.concat(month_data)
-            month_df.drop_duplicates(subset=['cups', 'date', 'time', 'month', 'year'], keep='last', inplace=True, ignore_index=True)
+            # month_df.drop_duplicates(subset=['cups', 'date', 'time', 'month', 'year'], keep='last', inplace=True, ignore_index=True)
             month_cups_list = month_df['cups'].unique()
             database_month_deletion(month_cups_list, username, password, host, database, month, year)
             

@@ -50,6 +50,47 @@ if "params" not in st.session_state:
     st.session_state['params'] = dict()
     
 # ===============================================================================================================
+# Other functions
+
+def show_pages_all():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Stay.py", "Stay", "🏛️"),
+                Page("pages/Tarragona.py", "Tarragona", "🏘️"),
+                Page("pages/Valencia.py", "Valencia", "🏢"),
+                Page("pages/Torrejon.py", "Torrejón", "🏙️"),
+                Page("pages/Cordoba.py", "Córdoba", "🏫"),
+                Page("pages/Almeria.py", "Almería", "🏤"),
+                Page("pages/Invitado.py", "Invitado", "🏡")
+            ]
+            )
+    return None
+
+def show_pages_stay():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Stay.py", "Stay", "🏛️"),
+                Page("pages/Tarragona.py", "Tarragona", "🏘️"),
+                Page("pages/Valencia.py", "Valencia", "🏢"),
+                Page("pages/Torrejon.py", "Torrejón", "🏙️"),
+                Page("pages/Cordoba.py", "Córdoba", "🏫")
+            ]
+            )
+    return None
+
+def show_pages_tarragona():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Tarragona.py", "Tarragona", "🏘️")
+            ]
+            )
+    return None
+
+    
+# ===============================================================================================================
 # Authentication
 
 if not st.session_state["authentication_status"]:
@@ -101,17 +142,12 @@ else:
     if st.session_state['username'] in tarragona_authorized_users:
         st.write(f'Bienvenido a la página de detalle de la propiedad de Tarragona')#, *{st.session_state["name"]}*')
 
-        show_pages(
-        [
-            Page("Home.py", "Home", ":computer:"),
-            Page("pages/Stay.py", "Stay", "🏡"),
-            Page("pages/Tarragona.py", "Tarragona", "🏡"),
-            Page("pages/Valencia.py", "Valencia", "🏢"),
-            Page("pages/Torrejon.py", "Torrejón", "🏙️"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫"),
-            Page("pages/Invitado.py", "Invitado", "🏘️")
-        ]
-        )
+        if st.session_state['username'] in st.session_state['moveam_users']:
+            show_pages_all()
+        elif st.session_state['username'] in st.session_state['stay_users']:
+            show_pages_stay()
+        else:
+            show_pages_tarragona()
 
         # ===============================================================================================================
         # System variables
@@ -141,6 +177,7 @@ else:
             # return st.markdown(f'<iframe title= {POWER_BI_TARRAGONA_TITLE} width="1140" height="541.25" src={POWER_BI_TARRAGONA_SRC} frameborder="0" allowFullScreen="true"></iframe>', unsafe_allow_html=True)
             embed_info = PbiEmbedService().get_embed_params_for_single_report(WORKSPACE_ID, REPORT_ID)
             api_response_json = json.dumps(embed_info)
+            # print(f' API response for plot: {api_response_json}')
             
             html_code = f'''
                 <!DOCTYPE html>
@@ -331,12 +368,7 @@ else:
         show_pages(
         [
             Page("Home.py", "Home", ":computer:"),
-            Page("pages/Stay.py", "Stay", "🏡"),
-            Page("pages/Tarragona.py", "Tarragona", "🏠"),
-            Page("pages/Valencia.py", "Valencia", "🏠"),
-            Page("pages/Torrejon.py", "Torrejón", "🏠"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫"),
-            Page("pages/Invitado.py", "Invitado", "🏘️")
+            Page("pages/Tarragona.py", "Tarragona", "🏠")
         ]
         )
         

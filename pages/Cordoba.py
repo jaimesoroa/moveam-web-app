@@ -2,15 +2,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from st_on_hover_tabs import on_hover_tabs
-# from datetime import date
-# import requests
 import time as t
 import os
-# import dotenv
 from dotenv import load_dotenv
-# import streamlit_authenticator as stauth
-# import yaml
-# from yaml.loader import SafeLoader
 from st_pages import Page, Section, show_pages, add_page_title
 from services.pbiembedservice import PbiEmbedService
 import json
@@ -45,6 +39,47 @@ else:
 
 if "params" not in st.session_state:
     st.session_state['params'] = dict()
+    
+
+# ===============================================================================================================
+# Other functions
+
+def show_pages_all():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Stay.py", "Stay", "🏛️"),
+                Page("pages/Tarragona.py", "Tarragona", "🏘️"),
+                Page("pages/Valencia.py", "Valencia", "🏢"),
+                Page("pages/Torrejon.py", "Torrejón", "🏙️"),
+                Page("pages/Cordoba.py", "Córdoba", "🏫"),
+                Page("pages/Almeria.py", "Almería", "🏤"),
+                Page("pages/Invitado.py", "Invitado", "🏡")
+            ]
+            )
+    return None
+
+def show_pages_stay():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Stay.py", "Stay", "🏛️"),
+                Page("pages/Tarragona.py", "Tarragona", "🏘️"),
+                Page("pages/Valencia.py", "Valencia", "🏢"),
+                Page("pages/Torrejon.py", "Torrejón", "🏙️"),
+                Page("pages/Cordoba.py", "Córdoba", "🏫")
+            ]
+            )
+    return None
+
+def show_pages_cordoba():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Cordoba.py", "Córdoba", "🏤")
+            ]
+            )
+    return None
 
 # ===============================================================================================================
 # Authentication
@@ -62,21 +97,16 @@ else:
     # ===============================================================================================================
     # User authorization
     
-    torrejon_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras']
-    if st.session_state['username'] in torrejon_authorized_users:
+    cordoba_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras']
+    if st.session_state['username'] in cordoba_authorized_users:
         st.write(f'Bienvenido a la página de detalle de la propiedad de Córdoba')#, *{st.session_state["name"]}*')
 
-        show_pages(
-        [
-            Page("Home.py", "Home", ":computer:"),
-            Page("pages/Stay.py", "Stay", "🏡"),
-            Page("pages/Tarragona.py", "Tarragona", "🏡"),
-            Page("pages/Valencia.py", "Valencia", "🏢"),
-            Page("pages/Torrejon.py", "Torrejón", "🏙️"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫"),
-            Page("pages/Invitado.py", "Invitado", "🏘️")
-        ]
-        )
+        if st.session_state['username'] in st.session_state['moveam_users']:
+            show_pages_all()
+        elif st.session_state['username'] in st.session_state['stay_users']:
+            show_pages_stay()
+        else:
+            show_pages_cordoba()
         
         # ===============================================================================================================
         # System variables
@@ -269,14 +299,10 @@ else:
         show_pages(
         [
             Page("Home.py", "Home", ":computer:"),
-            Page("pages/Stay.py", "Stay", "🏡"),
-            Page("pages/Tarragona.py", "Tarragona", "🏠"),
-            Page("pages/Valencia.py", "Valencia", "🏠"),
-            Page("pages/Torrejon.py", "Torrejón", "🏠"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫"),
-            Page("pages/Invitado.py", "Invitado", "🏘️")
+            Page("pages/Cordoba.py", "Córdoba", "🏫")
         ]
         )
+        
         st.write('No está autorizado a ver esta propiedad')
         st.markdown('<style>' + open('style.css').read() + '</style>', unsafe_allow_html=True)
         

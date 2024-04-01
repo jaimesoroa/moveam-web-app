@@ -220,7 +220,7 @@ def cups_month():
 # ==============================================================================================
 # Database connection
 # @task(log_prints=True)
-def database_connection(cups, username, password, host, database, month, df, year):
+def database_connection(cups, username, password, host, database, month, df, year, db_table):
     url_object = db.URL.create(
         "mysql+mysqldb",
         username=username,
@@ -235,7 +235,7 @@ def database_connection(cups, username, password, host, database, month, df, yea
         # Initialize the Metadata Object
         META_DATA = MetaData()
         MetaData.reflect(META_DATA, bind=engine)
-        ELECTRICIDAD = META_DATA.tables['ELECTRICIDAD']
+        ELECTRICIDAD = META_DATA.tables[db_table]
         
         # Use a single transaction for all deletions
         with engine.begin() as conn:
@@ -261,7 +261,7 @@ def database_connection(cups, username, password, host, database, month, df, yea
     
     return None
 
-def database_month_deletion(month_cups_list, username, password, host, database, month, year):
+def database_month_deletion(month_cups_list, username, password, host, database, month, year, db_table):
     url_object = db.URL.create(
         "mysql+mysqldb",
         username=username,
@@ -276,7 +276,7 @@ def database_month_deletion(month_cups_list, username, password, host, database,
         for cups in month_cups_list:
             META_DATA = MetaData()
             MetaData.reflect(META_DATA, bind=engine)
-            ELECTRICIDAD = META_DATA.tables['ELECTRICIDAD']
+            ELECTRICIDAD = META_DATA.tables[db_table]
             # Use a single transaction for all deletions
             with engine.begin() as conn:
                 dele = ELECTRICIDAD.delete().where(ELECTRICIDAD.c.month == int(month)).where(ELECTRICIDAD.c.year == int(year)).where(ELECTRICIDAD.c.cups == cups)
@@ -289,7 +289,7 @@ def database_month_deletion(month_cups_list, username, password, host, database,
     
     return None
 
-def database_writing(username, password, host, database, month, df, year):
+def database_writing(username, password, host, database, month, df, year, db_table):
     url_object = db.URL.create(
         "mysql+mysqldb",
         username=username,
@@ -304,7 +304,7 @@ def database_writing(username, password, host, database, month, df, year):
         # Use a single transaction for all deletions
         with engine.begin() as conn:
                 # Insert whole DataFrame into MySQL
-                df.to_sql('ELECTRICIDAD', con=engine, if_exists='append', chunksize=2000, index=False)
+                df.to_sql(db_table, con=engine, if_exists='append', chunksize=2000, index=False)
                 print(f'DataFrame from month {month} and year {year} written in database at {datetime.today().strftime("%Y-%m-%d %H:%M:%S.%f")}')
     except Exception as e:
         print(f"An error occurred for month {month} and year {year} when trying to write in database: {e}")
@@ -316,7 +316,7 @@ def database_writing(username, password, host, database, month, df, year):
 # ==============================================================================================
 # Download consumption from Datadis
 @task(log_prints=True)
-def consumption(months, cups_list, headers_moveam, username, password, host, database):
+def consumption(months, cups_list, headers_moveam, username, password, host, database, db_table, authorized_nif):
     status_code_list = []
     current_year = datetime.today().strftime('%Y')
     previous_year = str(int(current_year)-1)
@@ -333,7 +333,7 @@ def consumption(months, cups_list, headers_moveam, username, password, host, dat
             "measurementType": "0",
             "measurePointType": "5",
             "pointType": "5",
-            "authorizedNif": 'B88590583'
+            "authorizedNif": authorized_nif
             }
             # API request
             try:
@@ -362,8 +362,7 @@ def consumption(months, cups_list, headers_moveam, username, password, host, dat
             month_df = pd.concat(month_data)
             # month_df.drop_duplicates(subset=['cups', 'date', 'time', 'month', 'year'], keep='last', inplace=True, ignore_index=True)
             month_cups_list = month_df['cups'].unique()
-            database_month_deletion(month_cups_list, username, password, host, database, month, year)
-            
+            database_month_deletion(month_cups_list, username, password, host, database, month, year, db_table)
 
     if len(all_data) > 0:
         final_df = pd.concat(all_data)
@@ -371,27 +370,38 @@ def consumption(months, cups_list, headers_moveam, username, password, host, dat
     else:
         final_df = pd.DataFrame()
     
-    database_writing(username, password, host, database, month, final_df, year)
+    database_writing(username, password, host, database, month, final_df, year, db_table)
     
     return final_df
 
 
-@flow(name="cordoba-connection-flow", log_prints=True)
-def cordoba_flow():
+@flow(name="datadis-connection-flow", log_prints=True)
+def datadis_flow():
     
     datadis_secrets = get_secret_datadis()
     database_secrets = get_secrets_database()
-    (headers_moveam, supplies_response) = datadis_connection(datadis_secrets['datadis_username'], 
-                datadis_secrets['datadis_password'], datadis_secrets['datadis_authorized_nif'])
-    
-    cups_list = whole_cups_list(supplies_response)
-
     months = cups_month()
     
-    consumption_df = consumption(months, cups_list, headers_moveam, database_secrets['username'], database_secrets['password'], 
-        database_secrets['host'], database_secrets['dbname_cordoba'])
+    # Cordoba process
+    (headers_moveam_cordoba, supplies_response_cordoba) = datadis_connection(datadis_secrets['datadis_username'], 
+                datadis_secrets['datadis_password'], datadis_secrets['datadis_authorized_nif_cordoba'])
     
+    cups_list_cordoba = whole_cups_list(supplies_response_cordoba)
+    
+    consumption_df = consumption(months, cups_list_cordoba, headers_moveam_cordoba, database_secrets['username'], database_secrets['password'], 
+        database_secrets['host'], database_secrets['dbname_cordoba'], 'ELECTRICIDAD', datadis_secrets['datadis_authorized_nif_cordoba'])
+    
+    # Torrejón process
+    (headers_moveam_torrejon, supplies_response_torrejon) = datadis_connection(datadis_secrets['datadis_username'], 
+                datadis_secrets['datadis_password'], datadis_secrets['datadis_authorized_nif_torrejon'])
+    
+    cups_list_torrejon = whole_cups_list(supplies_response_torrejon)
+    
+    consumption_df = consumption(months, cups_list_torrejon, headers_moveam_torrejon, database_secrets['username'], database_secrets['password'], 
+        database_secrets['host'], database_secrets['dbname_torrejon'], 'ELECTRICIDAD_DATADIS', datadis_secrets['datadis_authorized_nif_torrejon'])
+        
     return consumption_df
+
     
 # Connection to Prefect cloud, not used for the moment.
 async def cloud_connection(prefect_api_url, prefect_api_key, prefect_tenant_id, cordoba_flow):
@@ -427,7 +437,7 @@ if __name__ == "__main__":
     # asyncio.run(cloud_connection(prefect_api_url, prefect_api_key, prefect_tenant_id, cordoba_flow))
 
     # Run the Prefect flow
-    cordoba_deploy= cordoba_flow.to_deployment(name="cordoba-first-deployment", cron= '00 11 * * *')#, work_pool_name= 'cordoba_pool', work_queue_name= 'cordoba_queue')
+    cordoba_deploy= datadis_flow.to_deployment(name="datadis_deployment", cron= '00 11 * * *')#, work_pool_name= 'cordoba_pool', work_queue_name= 'cordoba_queue')
     serve(cordoba_deploy)
     
     # To serve several flows at once:

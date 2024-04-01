@@ -34,6 +34,33 @@ else:
 
 if "params" not in st.session_state:
     st.session_state['params'] = dict()
+
+# ===============================================================================================================
+# Other functions
+
+def show_pages_all():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Stay.py", "Stay", "🏛️"),
+                Page("pages/Tarragona.py", "Tarragona", "🏘️"),
+                Page("pages/Valencia.py", "Valencia", "🏢"),
+                Page("pages/Torrejon.py", "Torrejón", "🏙️"),
+                Page("pages/Cordoba.py", "Córdoba", "🏫"),
+                Page("pages/Almeria.py", "Almería", "🏤"),
+                Page("pages/Invitado.py", "Invitado", "🏡")
+            ]
+            )
+    return None
+
+def show_pages_invitado():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Invitado.py", "Invitado", "🏡")
+            ]
+            )
+    return None
     
 # ===============================================================================================================
 # Authentication
@@ -53,19 +80,12 @@ else:
     
     invitado_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'invitado']
     if st.session_state['username'] in invitado_authorized_users:
-        st.write(f'Bienvenido a la página de Valdemoro')
-
-        show_pages(
-        [
-            Page("Home.py", "Home", ":computer:"),
-            Page("pages/Stay.py", "Stay", "🏡"),
-            Page("pages/Tarragona.py", "Tarragona", "🏡"),
-            Page("pages/Valencia.py", "Valencia", "🏢"),
-            Page("pages/Torrejon.py", "Torrejón", "🏙️"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫"),
-            Page("pages/Invitado.py", "Invitado", "🏘️")
-        ]
-        )
+        st.write(f'Bienvenido a la página de invitados')
+        
+        if st.session_state['username'] in st.session_state['moveam_users']:
+            show_pages_all()
+        else:
+            show_pages_invitado()
 
         # ===============================================================================================================
         # System variables
@@ -256,11 +276,6 @@ else:
         show_pages(
         [
             Page("Home.py", "Home", ":computer:"),
-            Page("pages/Stay.py", "Stay", "🏡"),
-            Page("pages/Tarragona.py", "Tarragona", "🏠"),
-            Page("pages/Valencia.py", "Valencia", "🏠"),
-            Page("pages/Torrejon.py", "Torrejón", "🏠"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫"),
             Page("pages/Invitado.py", "Invitado", "🏘️")
         ]
         )

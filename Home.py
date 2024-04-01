@@ -90,7 +90,9 @@ st.session_state['username'] = username
 
 # Define logo based on user
 moveam_users = ['jsoroa', 'fperez', 'jfuster', 'invitado']
+st.session_state['moveam_users'] = moveam_users
 stay_users = ['aheras']
+st.session_state['stay_users'] = stay_users
 
 if st.session_state['username'] in moveam_users:
     st.session_state['logo'] = "moveam"
@@ -170,6 +172,11 @@ st.session_state['powerbi_stay_title'] = powerbi_secrets['powerbi_stay_title']
 st.session_state['powerbi_stay_source'] = powerbi_secrets['powerbi_stay_source']
 st.session_state['powerbi_stay_id'] = powerbi_secrets['powerbi_stay_id']
 st.session_state['powerbi_stay_additional_dataset'] = powerbi_secrets['powerbi_stay_additional_dataset']
+st.session_state['powerbi_stay_additional_dataset_2'] = powerbi_secrets['powerbi_stay_additional_dataset_2']
+st.session_state['powerbi_stay_own_dataset'] = powerbi_secrets['powerbi_stay_own_dataset']
+st.session_state['powerbi_almeria_title'] = powerbi_secrets['powerbi_almeria_title']
+st.session_state['powerbi_almeria_source'] = powerbi_secrets['powerbi_almeria_source']
+st.session_state['powerbi_almeria_id'] = powerbi_secrets['powerbi_almeria_id']
 
 
 # Load configuration
@@ -213,8 +220,140 @@ def monthly_consumption(df):
 # st.session_state['data_tarragona_month'] = monthly_consumption(st.session_state['data_tarragona'])
 
 # ===============================================================================================================
+# Other functions
 
+# @st.cache_data(ttl= 3600)
+def show_pages_all():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Stay.py", "Stay", "🏛️"),
+                Page("pages/Tarragona.py", "Tarragona", "🏘️"),
+                Page("pages/Valencia.py", "Valencia", "🏢"),
+                Page("pages/Torrejon.py", "Torrejón", "🏙️"),
+                Page("pages/Cordoba.py", "Córdoba", "🏫"),
+                Page("pages/Almeria.py", "Almería", "🏤"),
+                Page("pages/Invitado.py", "Invitado", "🏡")
+            ]
+            )
+    return None
 
+# @st.cache_data(ttl= 3600)
+def show_pages_stay():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Stay.py", "Stay", "🏛️"),
+                Page("pages/Tarragona.py", "Tarragona", "🏘️"),
+                Page("pages/Valencia.py", "Valencia", "🏢"),
+                Page("pages/Torrejon.py", "Torrejón", "🏙️"),
+                Page("pages/Cordoba.py", "Córdoba", "🏫")
+            ]
+            )
+    return None
+
+def show_pages_home():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Invitado.py", "Invitado", "🏡")
+            ]
+            )
+    return None
+
+# @st.cache_data(ttl= 3600)
+def tabs_all():
+    tab_prop_1, tab_prop_2, tab_prop_3, tab_prop_4, tab_prop_5, tab_prop_6, tab_prop_7 = st.tabs(["Stay", "Tarragona", "Valencia", "Torrejón", "Córdoba", "Almería", "Invitado"])
+
+    with tab_prop_1:
+        stay_analitica = st.button('Ir a la página de centralización de propiedades de Stay', key = 'stay_analitica')
+        if stay_analitica:
+            switch_page('Stay')
+    
+    with tab_prop_2:
+        # st.metric(label="Consumo de energía del último mes", value="18.500 kWh", delta="+2%")
+        # st.markdown("Información de la propiedad")
+        tarragona_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'tarragona_analitica')
+        if tarragona_analitica:
+            switch_page('Tarragona')
+        # st.markdown("Se pueden integrar mapas por ejemplo")
+        # map_data = pd.DataFrame(
+        # np.random.randn(150, 2) / [50, 50] + [41.12, 1.24],
+        # columns=['lat', 'lon'])
+        # st.map(map_data)
+        st.markdown("""---""")
+        
+    with tab_prop_3:
+        # st.markdown("Información")
+        valencia_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'valencia_analitica')
+        if valencia_analitica:
+            switch_page('Valencia')
+    with tab_prop_4:
+        # st.markdown("Información")
+        torrejon_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'torrejon_analitica')
+        if torrejon_analitica:
+            switch_page('Torrejón')
+    
+    with tab_prop_5:
+        # st.markdown("Información")
+        cordoba_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'cordoba_analitica')
+        if cordoba_analitica:
+            switch_page('Córdoba')
+            
+    with tab_prop_6:
+        # st.markdown("Información")
+        cordoba_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'almeria_analitica')
+        if cordoba_analitica:
+            switch_page('Almería')
+    
+    with tab_prop_7:
+        # st.markdown("Información")
+        invitado_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'invitado_analitica')
+        if invitado_analitica:
+            switch_page('Invitado')
+            
+    return None
+
+# @st.cache_data(ttl= 3600)
+def tabs_stay():
+    tab_prop_1, tab_prop_2, tab_prop_3, tab_prop_4, tab_prop_5 = st.tabs(["Stay", "Tarragona", "Valencia", "Torrejón", "Córdoba"])
+
+    with tab_prop_1:
+        stay_analitica = st.button('Ir a la página de centralización de propiedades de Stay', key = 'stay_analitica')
+        if stay_analitica:
+            switch_page('Stay')
+    
+    with tab_prop_2:
+        # st.metric(label="Consumo de energía del último mes", value="18.500 kWh", delta="+2%")
+        # st.markdown("Información de la propiedad")
+        tarragona_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'tarragona_analitica')
+        if tarragona_analitica:
+            switch_page('Tarragona')
+        # st.markdown("Se pueden integrar mapas por ejemplo")
+        # map_data = pd.DataFrame(
+        # np.random.randn(150, 2) / [50, 50] + [41.12, 1.24],
+        # columns=['lat', 'lon'])
+        # st.map(map_data)
+        st.markdown("""---""")
+        
+    with tab_prop_3:
+        # st.markdown("Información")
+        valencia_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'valencia_analitica')
+        if valencia_analitica:
+            switch_page('Valencia')
+    with tab_prop_4:
+        # st.markdown("Información")
+        torrejon_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'torrejon_analitica')
+        if torrejon_analitica:
+            switch_page('Torrejón')
+    
+    with tab_prop_5:
+        # st.markdown("Información")
+        cordoba_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'cordoba_analitica')
+        if cordoba_analitica:
+            switch_page('Córdoba')
+            
+    return None
 
 # ===============================================================================================================
 # Authentication privileges
@@ -257,19 +396,14 @@ if authentication_status:
     
     # Pages to be shown when looged in
     # Specify what pages should be shown in the sidebar, and what their titles and icons should be
-    show_pages(
-        [
-            Page("Home.py", "Home", ":computer:"),
-            Page("pages/Stay.py", "Stay", "🏡"),
-            Page("pages/Tarragona.py", "Tarragona", "🏡"),
-            Page("pages/Valencia.py", "Valencia", "🏢"),
-            Page("pages/Torrejon.py", "Torrejón", "🏙️"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫"),
-            Page("pages/Invitado.py", "Invitado", "🏘️")
-        ]
-        )
-
-
+    
+    if st.session_state['username'] in moveam_users:
+        show_pages_all()
+    elif st.session_state['username'] in stay_users:
+        show_pages_stay()
+    else:
+        show_pages_home()   
+    
     
     # ===============================================================================================================
     # Beginning of page
@@ -329,50 +463,11 @@ if authentication_status:
             st.write('')
 
         st.markdown("""---""")
-
-        tab_prop_1, tab_prop_2, tab_prop_3, tab_prop_4, tab_prop_5, tab_prop_6 = st.tabs(["Stay", "Tarragona", "Valencia", "Torrejón", "Córdoba", "Invitado"])
-
-        with tab_prop_1:
-            stay_analitica = st.button('Ir a la página de centralización de propiedades de Stay', key = 'stay_analitica')
-            if stay_analitica:
-                switch_page('Stay')
         
-        with tab_prop_2:
-            # st.metric(label="Consumo de energía del último mes", value="18.500 kWh", delta="+2%")
-            # st.markdown("Información de la propiedad")
-            tarragona_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'tarragona_analitica')
-            if tarragona_analitica:
-                switch_page('Tarragona')
-            # st.markdown("Se pueden integrar mapas por ejemplo")
-            # map_data = pd.DataFrame(
-            # np.random.randn(150, 2) / [50, 50] + [41.12, 1.24],
-            # columns=['lat', 'lon'])
-            # st.map(map_data)
-            st.markdown("""---""")
-            
-        with tab_prop_3:
-            # st.markdown("Información")
-            valencia_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'valencia_analitica')
-            if valencia_analitica:
-                switch_page('Valencia')
-
-        with tab_prop_4:
-            # st.markdown("Información")
-            torrejon_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'torrejon_analitica')
-            if torrejon_analitica:
-                switch_page('Torrejón')
-        
-        with tab_prop_5:
-            # st.markdown("Información")
-            cordoba_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'cordoba_analitica')
-            if cordoba_analitica:
-                switch_page('Córdoba')
-        
-        with tab_prop_6:
-            # st.markdown("Información")
-            invitado_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'invitado_analitica')
-            if invitado_analitica:
-                switch_page('Invitado')
+        if st.session_state['username'] in moveam_users:
+            tabs_all()
+        else:
+            tabs_stay()
     
     # ===============================================================================================================
     # Tab Otros

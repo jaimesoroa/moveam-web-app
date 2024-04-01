@@ -47,6 +47,46 @@ if "params" not in st.session_state:
     st.session_state['params'] = dict()
 
 # ===============================================================================================================
+# Other functions
+
+def show_pages_all():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Stay.py", "Stay", "🏛️"),
+                Page("pages/Tarragona.py", "Tarragona", "🏘️"),
+                Page("pages/Valencia.py", "Valencia", "🏢"),
+                Page("pages/Torrejon.py", "Torrejón", "🏙️"),
+                Page("pages/Cordoba.py", "Córdoba", "🏫"),
+                Page("pages/Almeria.py", "Almería", "🏤"),
+                Page("pages/Invitado.py", "Invitado", "🏡")
+            ]
+            )
+    return None
+
+def show_pages_stay():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Stay.py", "Stay", "🏛️"),
+                Page("pages/Tarragona.py", "Tarragona", "🏘️"),
+                Page("pages/Valencia.py", "Valencia", "🏢"),
+                Page("pages/Torrejon.py", "Torrejón", "🏙️"),
+                Page("pages/Cordoba.py", "Córdoba", "🏫")
+            ]
+            )
+    return None
+
+def show_pages_torrejon():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Torrejon.py", "Torrejón", "🏙️")
+            ]
+            )
+    return None
+
+# ===============================================================================================================
 # Authentication
 
 if not st.session_state["authentication_status"]:
@@ -66,17 +106,12 @@ else:
     if st.session_state['username'] in torrejon_authorized_users:
         st.write(f'Bienvenido a la página de detalle de la propiedad de Torrejón')#, *{st.session_state["name"]}*')
 
-        show_pages(
-        [
-            Page("Home.py", "Home", ":computer:"),
-            Page("pages/Stay.py", "Stay", "🏡"),
-            Page("pages/Tarragona.py", "Tarragona", "🏡"),
-            Page("pages/Valencia.py", "Valencia", "🏢"),
-            Page("pages/Torrejon.py", "Torrejón", "🏙️"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫"),
-            Page("pages/Invitado.py", "Invitado", "🏘️")
-        ]
-        )
+        if st.session_state['username'] in st.session_state['moveam_users']:
+            show_pages_all()
+        elif st.session_state['username'] in st.session_state['stay_users']:
+            show_pages_stay()
+        else:
+            show_pages_torrejon()
         
         # ===============================================================================================================
         # System variables
@@ -267,12 +302,7 @@ else:
         show_pages(
         [
             Page("Home.py", "Home", ":computer:"),
-            Page("pages/Stay.py", "Stay", "🏡"),
-            Page("pages/Tarragona.py", "Tarragona", "🏠"),
-            Page("pages/Valencia.py", "Valencia", "🏠"),
-            Page("pages/Torrejon.py", "Torrejón", "🏠"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫"),
-            Page("pages/Invitado.py", "Invitado", "🏘️")
+            Page("pages/Torrejon.py", "Torrejón", "🏠")
         ]
         )
         st.write('No está autorizado a ver esta propiedad')

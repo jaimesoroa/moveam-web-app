@@ -316,7 +316,7 @@ def database_writing(username, password, host, database, month, df, year, db_tab
 # ==============================================================================================
 # Download consumption from Datadis
 @task(log_prints=True)
-def consumption(months, cups_list, headers_moveam, username, password, host, database, db_table, authorized_nif):
+def consumption(months, cups_list, headers_moveam, username, password, host, database, db_table, authorized_nif, distributorCode):
     status_code_list = []
     current_year = datetime.today().strftime('%Y')
     previous_year = str(int(current_year)-1)
@@ -327,7 +327,7 @@ def consumption(months, cups_list, headers_moveam, username, password, host, dat
         for cups in cups_list:
             consumption_params = {
             "cups": cups,
-            "distributorCode": "2",
+            "distributorCode": distributorCode,
             "startDate": f'{year}/{month}',
             "endDate": f'{year}/{month}',
             "measurementType": "0",
@@ -388,8 +388,8 @@ def datadis_flow():
     
     cups_list_cordoba = whole_cups_list(supplies_response_cordoba)
     
-    consumption_df = consumption(months, cups_list_cordoba, headers_moveam_cordoba, database_secrets['username'], database_secrets['password'], 
-        database_secrets['host'], database_secrets['dbname_cordoba'], 'ELECTRICIDAD', datadis_secrets['datadis_authorized_nif_cordoba'])
+    consumption_df_cordoba = consumption(months, cups_list_cordoba, headers_moveam_cordoba, database_secrets['username'], database_secrets['password'], 
+        database_secrets['host'], database_secrets['dbname_cordoba'], 'ELECTRICIDAD', datadis_secrets['datadis_authorized_nif_cordoba'], '2')
     
     # Torrejón process
     (headers_moveam_torrejon, supplies_response_torrejon) = datadis_connection(datadis_secrets['datadis_username'], 
@@ -397,10 +397,10 @@ def datadis_flow():
     
     cups_list_torrejon = whole_cups_list(supplies_response_torrejon)
     
-    consumption_df = consumption(months, cups_list_torrejon, headers_moveam_torrejon, database_secrets['username'], database_secrets['password'], 
-        database_secrets['host'], database_secrets['dbname_torrejon'], 'ELECTRICIDAD_DATADIS', datadis_secrets['datadis_authorized_nif_torrejon'])
+    consumption_df_torrejon = consumption(months, cups_list_torrejon, headers_moveam_torrejon, database_secrets['username'], database_secrets['password'], 
+        database_secrets['host'], database_secrets['dbname_torrejon'], 'ELECTRICIDAD_DATADIS', datadis_secrets['datadis_authorized_nif_torrejon'], '8')
         
-    return consumption_df
+    return consumption_df_cordoba, consumption_df_torrejon
 
     
 # Connection to Prefect cloud, not used for the moment.
@@ -437,8 +437,8 @@ if __name__ == "__main__":
     # asyncio.run(cloud_connection(prefect_api_url, prefect_api_key, prefect_tenant_id, cordoba_flow))
 
     # Run the Prefect flow
-    cordoba_deploy= datadis_flow.to_deployment(name="datadis_deployment", cron= '00 11 * * *')#, work_pool_name= 'cordoba_pool', work_queue_name= 'cordoba_queue')
-    serve(cordoba_deploy)
+    datadis_deploy= datadis_flow.to_deployment(name="datadis_deployment", cron= '00 10 * * *')#, work_pool_name= 'cordoba_pool', work_queue_name= 'cordoba_queue')
+    serve(datadis_deploy)
     
     # To serve several flows at once:
 

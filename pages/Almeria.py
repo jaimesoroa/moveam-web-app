@@ -194,7 +194,7 @@ else:
         if tabs == 'Consumos':
             c1, c2,  = st.columns([15, 1.5], gap='medium')
             with c1:
-                st.title("Consumos de Córdoba")
+                st.title("Consumos de Almería")
             with c2:
                 if st.session_state['logo'] == "moveam":
                     st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
@@ -211,20 +211,19 @@ else:
             
             with tab_cons_2:
                 st.markdown('En construcción')
-                st.markdown("Consumos generales de la propiedad")
-                # plot_power_bi_torrejon()
-                st.markdown("""---""")
+                # st.markdown("Consumos generales de la propiedad")
+                # st.markdown("""---""")
 
             with tab_cons_3:
                 st.markdown('En construcción')
-                selected_apt_4 = st.selectbox('Seleccionar la vivienda cuyo consumo desea consultar',
-            (101, 102, 103))
-                if selected_apt_4 == 101:
-                    st.markdown("Aquí pondríamos el detall del consumo del 101")
-                if selected_apt_4 == 102:
-                    st.markdown("Aquí pondríamos el detall del consumo del 102")
-                if selected_apt_4 == 103:
-                    st.markdown("Aquí pondríamos el detall del consumo del 103")
+            #     selected_apt_4 = st.selectbox('Seleccionar la vivienda cuyo consumo desea consultar',
+            # (101, 102, 103))
+            #     if selected_apt_4 == 101:
+            #         st.markdown("Aquí pondríamos el detall del consumo del 101")
+            #     if selected_apt_4 == 102:
+            #         st.markdown("Aquí pondríamos el detall del consumo del 102")
+            #     if selected_apt_4 == 103:
+            #         st.markdown("Aquí pondríamos el detall del consumo del 103")
 
         # ===============================================================================================================
         # Tab Vehículos

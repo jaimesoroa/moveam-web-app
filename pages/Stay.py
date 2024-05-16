@@ -91,7 +91,7 @@ else:
 # ===============================================================================================================
     # User authorization
     
-    stay_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras']
+    stay_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras', 'crodriguez', 'agarcia']
     if st.session_state['username'] in stay_authorized_users:
         st.write(f'Bienvenido a la página de propiedades de Stay')#, *{st.session_state["name"]}*')
         

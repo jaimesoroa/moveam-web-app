@@ -138,7 +138,7 @@ else:
 # ===============================================================================================================
     # User authorization
     
-    tarragona_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras']
+    tarragona_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras', 'crodriguez', 'agarcia']
     if st.session_state['username'] in tarragona_authorized_users:
         st.write(f'Bienvenido a la página de detalle de la propiedad de Tarragona')#, *{st.session_state["name"]}*')
 

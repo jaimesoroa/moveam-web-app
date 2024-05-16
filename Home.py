@@ -91,7 +91,7 @@ st.session_state['username'] = username
 # Define logo based on user
 moveam_users = ['jsoroa', 'fperez', 'jfuster', 'invitado']
 st.session_state['moveam_users'] = moveam_users
-stay_users = ['aheras']
+stay_users = ['aheras', 'crodriguez', 'agarcia']
 st.session_state['stay_users'] = stay_users
 
 if st.session_state['username'] in moveam_users:

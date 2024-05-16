@@ -100,7 +100,7 @@ else:
     # ===============================================================================================================
     # User authorization
     
-    valencia_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras']
+    valencia_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras', 'crodriguez', 'agarcia']
     if st.session_state['username'] in valencia_authorized_users:
         st.write(f'Bienvenido a la página de detalle de la propiedad de Valencia')#, *{st.session_state["name"]}*')
 

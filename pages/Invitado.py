@@ -91,7 +91,8 @@ else:
         # System variables
 
         WORKSPACE_ID = st.session_state['power_bi_moveam_wokspace_id']
-        REPORT_ID = st.session_state['powerbi_valdemoro_id']
+        REPORT_ID = st.session_state['powerbi_tarragona_invitado_id']
+        REPORT_ID_2 = st.session_state['powerbi_stay_invitado_id']
         
         # ===============================================================================================================
         # Functions
@@ -111,7 +112,7 @@ else:
         #     return df_flat_month
         
         # @st.cache_resource
-        def plot_power_bi_valdemoro():
+        def plot_power_bi_invitado():
             # return st.markdown(f'<iframe title= {POWER_BI_TARRAGONA_TITLE} width="1140" height="541.25" src={POWER_BI_TARRAGONA_SRC} frameborder="0" allowFullScreen="true"></iframe>', unsafe_allow_html=True)
             embed_info = PbiEmbedService().get_embed_params_for_single_report(WORKSPACE_ID, REPORT_ID)
             api_response_json = json.dumps(embed_info)
@@ -141,6 +142,68 @@ else:
                             tokenType: models.TokenType.Embed,
                             accessToken: accessToken,
                             embedUrl: 'https://app.powerbi.com/reportEmbed?reportId={REPORT_ID}&groupId={WORKSPACE_ID}',
+                            settings: {{
+                                filterPaneEnabled: true,
+                                navContentPaneEnabled: true,
+                                panes: {{
+                                    filters: {{
+                                        expanded: true,
+                                        visible: true
+                                    }}
+                                }},
+                                layoutType: models.LayoutType.Custom, // Ensure this property is set to Custom
+                                customLayout: {{
+                                    displayOption: models.DisplayOption.FitToPage,
+                                    pageSize: {{
+                                        // These dimensions define the size of the report page.
+                                        type: models.PageSizeType.Custom,
+                                        // Higher width, smaller page
+                                        width: 1300, // Set the desired width. If too small, the report page gets cut
+                                        // Height doesn't change the page size, but small height covers the bottom.
+                                        height: 720 // Set the desired height
+                                    }}
+                                }}
+                            }}
+                        }};
+                        var reportContainer = document.getElementById('reportContainer');
+                        var report = powerbi.embed(reportContainer, config);
+                    }};
+                </script>
+            '''
+            # Display embedded report. These dimensions define the streamlit window.
+            st.components.v1.html(html_code, height= 700, width= 1200, scrolling= True)
+            st.markdown("""---""")
+            
+        def plot_power_bi_invitado_2():
+            # return st.markdown(f'<iframe title= {POWER_BI_TARRAGONA_TITLE} width="1140" height="541.25" src={POWER_BI_TARRAGONA_SRC} frameborder="0" allowFullScreen="true"></iframe>', unsafe_allow_html=True)
+            embed_info = PbiEmbedService().get_embed_params_for_single_report(WORKSPACE_ID, REPORT_ID_2)
+            api_response_json = json.dumps(embed_info)
+            
+            html_code = f'''
+                <!DOCTYPE html>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/powerbi-client/2.15.1/powerbi.min.js" integrity="sha512-OWIl8Xrlo8yQjWN5LcMz5SIgNnzcJqeelChqPMIeQGnEFJ4m1fWWn668AEXBrKlsuVbvDebTUJGLRCtRCCiFkg==" crossorigin="anonymous"></script>
+                <div id="reportContainer">
+                    <iframe width="100%" height=750" src="https://app.powerbi.com/reportEmbed?reportId={REPORT_ID_2}&groupId={WORKSPACE_ID}" frameborder="0" allowFullScreen="true"></iframe>
+                </div>
+                <style>
+                    #reportContainer {{
+                        height: 100vh;
+                        width: 100%;
+                    }}
+                </style>
+                <script type="text/javascript">
+                    window.onload = function() {{
+                        // Parse the JSON data received from the API
+                        var apiResponse = JSON.parse({api_response_json});
+                        // Extract token and other properties from the parsed data
+                        var accessToken = apiResponse.accessToken;
+                        var expiration = apiResponse.tokenExpiry;
+                        var models = window["powerbi-client"].models;
+                        var config = {{
+                            type: 'report',
+                            tokenType: models.TokenType.Embed,
+                            accessToken: accessToken,
+                            embedUrl: 'https://app.powerbi.com/reportEmbed?reportId={REPORT_ID_2}&groupId={WORKSPACE_ID}',
                             settings: {{
                                 filterPaneEnabled: true,
                                 navContentPaneEnabled: true,
@@ -213,8 +276,9 @@ else:
 
             with tab_cons_1:
                 st.markdown("Integración de Dashboard")
-                plot_power_bi_valdemoro()
+                plot_power_bi_invitado()
                 st.markdown("""---""")
+                plot_power_bi_invitado_2()
 
             with tab_cons_2:
                 st.markdown('En construcción')

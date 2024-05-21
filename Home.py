@@ -177,7 +177,12 @@ st.session_state['powerbi_stay_own_dataset'] = powerbi_secrets['powerbi_stay_own
 st.session_state['powerbi_almeria_title'] = powerbi_secrets['powerbi_almeria_title']
 st.session_state['powerbi_almeria_source'] = powerbi_secrets['powerbi_almeria_source']
 st.session_state['powerbi_almeria_id'] = powerbi_secrets['powerbi_almeria_id']
-
+st.session_state['powerbi_tarragona_invitado_id'] = powerbi_secrets['powerbi_tarragona_invitado_id']
+st.session_state['powerbi_tarragona_invitado_title'] = powerbi_secrets['powerbi_tarragona_invitado_title']
+st.session_state['powerbi_tarragona_invitado_source'] = powerbi_secrets['powerbi_tarragona_invitado_source']
+st.session_state['powerbi_stay_invitado_id'] = powerbi_secrets['powerbi_stay_invitado_id']
+st.session_state['powerbi_stay_invitado_title'] = powerbi_secrets['powerbi_stay_invitado_title']
+st.session_state['powerbi_stay_invitado_source'] = powerbi_secrets['powerbi_stay_invitado_source']
 
 # Load configuration
 

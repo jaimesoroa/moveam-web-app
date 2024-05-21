@@ -261,7 +261,7 @@ else:
         if tabs == 'Consumos':
             c1, c2,  = st.columns([15, 1.5], gap='medium')
             with c1:
-                st.title("Consumos de Valdemoro")
+                st.title("Consumos de ejemplo")
             with c2:
                 if st.session_state['logo'] == "moveam":
                     st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")

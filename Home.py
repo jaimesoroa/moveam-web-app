@@ -89,12 +89,14 @@ st.session_state['username'] = username
 # hashed_passwords = stauth.Hasher(['abc', 'def']).generate()
 
 # Define logo based on user
-moveam_users = ['jsoroa', 'fperez', 'jfuster', 'invitado']
+moveam_users = ['jsoroa', 'fperez', 'jfuster', 'rsaenz']
 st.session_state['moveam_users'] = moveam_users
 stay_users = ['aheras', 'crodriguez', 'agarcia']
 st.session_state['stay_users'] = stay_users
+almeria_users = ['rambla240_1']
+st.session_state['almeria_users'] = almeria_users
 
-if st.session_state['username'] in moveam_users:
+if (st.session_state['username'] in moveam_users) or (st.session_state['username'] in almeria_users) or (st.session_state['username'] == 'invitado'):
     st.session_state['logo'] = "moveam"
 else:
     st.session_state['logo'] = "stay"
@@ -183,6 +185,9 @@ st.session_state['powerbi_tarragona_invitado_source'] = powerbi_secrets['powerbi
 st.session_state['powerbi_stay_invitado_id'] = powerbi_secrets['powerbi_stay_invitado_id']
 st.session_state['powerbi_stay_invitado_title'] = powerbi_secrets['powerbi_stay_invitado_title']
 st.session_state['powerbi_stay_invitado_source'] = powerbi_secrets['powerbi_stay_invitado_source']
+st.session_state['powerbi_valencia_id'] = powerbi_secrets['powerbi_valencia_id']
+st.session_state['powerbi_valencia_title'] = powerbi_secrets['powerbi_valencia_title']
+st.session_state['powerbi_valencia_source'] = powerbi_secrets['powerbi_valencia_source']
 
 # Load configuration
 
@@ -262,6 +267,15 @@ def show_pages_home():
             [
                 Page("Home.py", "Home", ":computer:"),
                 Page("pages/Invitado.py", "Invitado", "🏡")
+            ]
+            )
+    return None
+
+def show_pages_almeria():
+    show_pages(
+            [
+                Page("Home.py", "Home", ":computer:"),
+                Page("pages/Almeria.py", "Almería", "🏤")
             ]
             )
     return None
@@ -360,6 +374,28 @@ def tabs_stay():
             
     return None
 
+def tabs_invitado():
+    tab_prop_7, = st.tabs(["Invitado"])
+
+    with tab_prop_7:
+        # st.markdown("Información")
+        invitado_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'invitado_analitica')
+        if invitado_analitica:
+            switch_page('Invitado')
+            
+    return None
+
+def tabs_almeria():
+    tab_prop_6, = st.tabs(["Almería"])
+
+    with tab_prop_6:
+        # st.markdown("Información")
+        almeria_analitica = st.button('Ir a la página de analítica de la propiedad', key = 'almeria_analitica')
+        if almeria_analitica:
+            switch_page('Almería')
+            
+    return None
+
 # ===============================================================================================================
 # Authentication privileges
 
@@ -406,9 +442,11 @@ if authentication_status:
         show_pages_all()
     elif st.session_state['username'] in stay_users:
         show_pages_stay()
+    elif st.session_state['username'] in almeria_users:
+        show_pages_almeria()
     else:
-        show_pages_home()   
-    
+        show_pages_home()
+
     
     # ===============================================================================================================
     # Beginning of page
@@ -471,8 +509,12 @@ if authentication_status:
         
         if st.session_state['username'] in moveam_users:
             tabs_all()
-        else:
+        elif st.session_state['username'] in almeria_users:
+            tabs_almeria()
+        elif st.session_state['username'] in stay_users:
             tabs_stay()
+        else:
+            tabs_invitado()
     
     # ===============================================================================================================
     # Tab Otros

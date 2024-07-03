@@ -91,7 +91,7 @@ else:
 # ===============================================================================================================
     # User authorization
     
-    stay_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras', 'crodriguez', 'agarcia']
+    stay_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras', 'crodriguez', 'agarcia', 'rsaenz']
     if st.session_state['username'] in stay_authorized_users:
         st.write(f'Bienvenido a la página de propiedades de Stay')#, *{st.session_state["name"]}*')
         
@@ -99,18 +99,6 @@ else:
             show_pages_all()
         else:
             show_pages_stay()
-
-        show_pages(
-        [
-            Page("Home.py", "Home", ":computer:"),
-            Page("pages/Stay.py", "Stay", "🏡"),
-            Page("pages/Tarragona.py", "Tarragona", "🏡"),
-            Page("pages/Valencia.py", "Valencia", "🏢"),
-            Page("pages/Torrejon.py", "Torrejón", "🏙️"),
-            Page("pages/Cordoba.py", "Córdoba", "🏫"),
-            Page("pages/Invitado.py", "Invitado", "🏘️")
-        ]
-        )
 
         # ===============================================================================================================
         # System variables
@@ -281,165 +269,164 @@ else:
                                                           'text-transform': 'None'}},
                                      key="0")
 
-'''
+
 # Code from Gemini to request token for dashboard of dashboards.
 
-import requests
-import json
+# import requests
+# import json
 
-def get_embed_token(TENANT_ID, CLIENT_ID, CLIENT_SECRET, REPORT_ID, WORKSPACE_ID, DATASET_1_ID, DATASET_2_ID):
-  """
-  This function requests an embed token for a Power BI report with access to two datasets.
+# def get_embed_token(TENANT_ID, CLIENT_ID, CLIENT_SECRET, REPORT_ID, WORKSPACE_ID, DATASET_1_ID, DATASET_2_ID):
+#   """
+#   This function requests an embed token for a Power BI report with access to two datasets.
 
-  Args:
-      TENANT_ID (str): Azure Active Directory tenant ID.
-      CLIENT_ID (str): Application (client) ID for your application.
-      CLIENT_SECRET (str): Client secret for your application.
-      REPORT_ID (str): ID of the Power BI report.
-      WORKSPACE_ID (str): ID of the workspace containing the report.
-      DATASET_1_ID (str): ID of the first dataset used in the report.
-      DATASET_2_ID (str): ID of the second dataset used in the report.
+#   Args:
+#       TENANT_ID (str): Azure Active Directory tenant ID.
+#       CLIENT_ID (str): Application (client) ID for your application.
+#       CLIENT_SECRET (str): Client secret for your application.
+#       REPORT_ID (str): ID of the Power BI report.
+#       WORKSPACE_ID (str): ID of the workspace containing the report.
+#       DATASET_1_ID (str): ID of the first dataset used in the report.
+#       DATASET_2_ID (str): ID of the second dataset used in the report.
 
-  Returns:
-      dict: Embed token information or None on error.
-  """
+#   Returns:
+#       dict: Embed token information or None on error.
+#   """
 
-  # Resource URL for Power BI API
-  resource_url = "https://analysis.windows.net/powerbi/api"
+#   # Resource URL for Power BI API
+#   resource_url = "https://analysis.windows.net/powerbi/api"
 
-  # Token endpoint URL
-  token_url = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/token"
+#   # Token endpoint URL
+#   token_url = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/token"
 
-  # Data for requesting access token
-  data = {
-      "grant_type": "client_credentials",
-      "scope": f"https://{TENANT_ID}/{resource_url}/generatetoken",
-      "client_id": CLIENT_ID,
-      "client_secret": CLIENT_SECRET
-  }
+#   # Data for requesting access token
+#   data = {
+#       "grant_type": "client_credentials",
+#       "scope": f"https://{TENANT_ID}/{resource_url}/generatetoken",
+#       "client_id": CLIENT_ID,
+#       "client_secret": CLIENT_SECRET
+#   }
 
-  # Get access token
-  try:
-      response = requests.post(token_url, data=data)
-      response.raise_for_status()
-      access_token = response.json()["access_token"]
-  except requests.exceptions.RequestException as error:
-      print(f"Error getting access token: {error}")
-      return None
+#   # Get access token
+#   try:
+#       response = requests.post(token_url, data=data)
+#       response.raise_for_status()
+#       access_token = response.json()["access_token"]
+#   except requests.exceptions.RequestException as error:
+#       print(f"Error getting access token: {error}")
+#       return None
 
-  # Data for requesting embed token
-  embed_token_data = {
-      "reports": [
-          {
-              "id": REPORT_ID,
-              "datasets": [
-                  {
-                      "id": DATASET_1_ID,
-                      "xmlaPermissions": "ReadOnly"
-                  },
-                  {
-                      "id": DATASET_2_ID,
-                      "xmlaPermissions": "ReadOnly"
-                  }
-              ]
-          }
-      ]
-  }
+#   # Data for requesting embed token
+#   embed_token_data = {
+#       "reports": [
+#           {
+#               "id": REPORT_ID,
+#               "datasets": [
+#                   {
+#                       "id": DATASET_1_ID,
+#                       "xmlaPermissions": "ReadOnly"
+#                   },
+#                   {
+#                       "id": DATASET_2_ID,
+#                       "xmlaPermissions": "ReadOnly"
+#                   }
+#               ]
+#           }
+#       ]
+#   }
 
-  # Headers with authorization
-  headers = {
-      "Authorization": f"Bearer {access_token}",
-      "Content-Type": "application/json"
-  }
+#   # Headers with authorization
+#   headers = {
+#       "Authorization": f"Bearer {access_token}",
+#       "Content-Type": "application/json"
+#   }
 
-  # URL for generating embed token
-  embed_token_url = f"https://api.powerbi.com/v1.0/myorg/groups/{WORKSPACE_ID}/reports/{REPORT_ID}/GenerateToken"
+#   # URL for generating embed token
+#   embed_token_url = f"https://api.powerbi.com/v1.0/myorg/groups/{WORKSPACE_ID}/reports/{REPORT_ID}/GenerateToken"
 
-  # Get embed token
-  try:
-      response = requests.post(embed_token_url, headers=headers, json=embed_token_data)
-      response.raise_for_status()
-      return response.json()
-  except requests.exceptions.RequestException as error:
-      print(f"Error getting embed token: {error}")
-      return None
+#   # Get embed token
+#   try:
+#       response = requests.post(embed_token_url, headers=headers, json=embed_token_data)
+#       response.raise_for_status()
+#       return response.json()
+#   except requests.exceptions.RequestException as error:
+#       print(f"Error getting embed token: {error}")
+#       return None
 
-# Example usage (replace with your actual values)
-tenant_id = "YOUR_TENANT_ID"
-client_id = "YOUR_CLIENT_ID"
-client_secret = "YOUR_CLIENT_SECRET"
-report_id = "YOUR_REPORT_ID"
-workspace_id = "YOUR_WORKSPACE_ID"
-dataset_1_id = "YOUR_DATASET_1_ID"
-dataset_2_id = "YOUR_DATASET_2_ID"
+# # Example usage (replace with your actual values)
+# tenant_id = "YOUR_TENANT_ID"
+# client_id = "YOUR_CLIENT_ID"
+# client_secret = "YOUR_CLIENT_SECRET"
+# report_id = "YOUR_REPORT_ID"
+# workspace_id = "YOUR_WORKSPACE_ID"
+# dataset_1_id = "YOUR_DATASET_1_ID"
+# dataset_2_id = "YOUR_DATASET_2_ID"
 
-embed_token = get_embed_token(tenant_id, client_id, client_secret, report_id, workspace_id, dataset_1_id, dataset_2_id)
+# embed_token = get_embed_token(tenant_id, client_id, client_secret, report_id, workspace_id, dataset_1_id, dataset_2_id)
 
-if embed_token:
-  print(f"Embed token: {embed_token}")
-else:
-  print("Failed to retrieve embed token")
-
-
-JavaScript
-
-async function embedReport(accessToken, workspaceId, reportId) {
-  // Load the powerbi client library
-  const powerbi = window.powerbi;
-
-  // Configuration object for embedding
-  const config = {
-    type: 'report',
-    tokenType: powerbi.models.TokenType.Embed,
-    accessToken: accessToken,
-    embedUrl: `https://app.powerbi.com/reportEmbed?reportId=${reportId}&groupId=${workspaceId}`,
-    permissions: powerbi.models.Permissions.All,
-    settings: {
-      filterPaneEnabled: true,
-      navContentPaneEnabled: true
-    }
-  };
-
-  // Get the embed container element
-  const embedContainer = document.getElementById('embedContainer');
-
-  try {
-    // Embed the report
-    const report = await powerbi.embed(embedContainer, config);
-    console.log("Report embedded successfully!");
-  } catch (error) {
-    console.error("Error embedding report:", error);
-  }
-}
-
-// Example usage (replace with your token retrieved from Python)
-const embedToken = "YOUR_EMBED_TOKEN";
-const workspaceId = "YOUR_WORKSPACE_ID";
-const reportId = "YOUR_REPORT_ID";
-
-embedReport(embedToken, workspaceId, reportId);
+# if embed_token:
+#   print(f"Embed token: {embed_token}")
+# else:
+#   print("Failed to retrieve embed token")
 
 
+# JavaScript
 
-HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Embed Power BI Report</title>
-  <script src="https://cdn.powerbi.com/powerbi-client.js"></script>
-</head>
-<body>
-  <h1>Power BI Report</h1>
-  <div id="embedContainer"></div>
+# async function embedReport(accessToken, workspaceId, reportId) {
+#   // Load the powerbi client library
+#   const powerbi = window.powerbi;
 
-  <script>
-    // Call the embedReport function from your JavaScript file
-    embedReport('YOUR_EMBED_TOKEN', 'YOUR_WORKSPACE_ID', 'YOUR_REPORT_ID');
-  </script>
-</body>
-</html>
+#   // Configuration object for embedding
+#   const config = {
+#     type: 'report',
+#     tokenType: powerbi.models.TokenType.Embed,
+#     accessToken: accessToken,
+#     embedUrl: `https://app.powerbi.com/reportEmbed?reportId=${reportId}&groupId=${workspaceId}`,
+#     permissions: powerbi.models.Permissions.All,
+#     settings: {
+#       filterPaneEnabled: true,
+#       navContentPaneEnabled: true
+#     }
+#   };
+
+#   // Get the embed container element
+#   const embedContainer = document.getElementById('embedContainer');
+
+#   try {
+#     // Embed the report
+#     const report = await powerbi.embed(embedContainer, config);
+#     console.log("Report embedded successfully!");
+#   } catch (error) {
+#     console.error("Error embedding report:", error);
+#   }
+# }
+
+# // Example usage (replace with your token retrieved from Python)
+# const embedToken = "YOUR_EMBED_TOKEN";
+# const workspaceId = "YOUR_WORKSPACE_ID";
+# const reportId = "YOUR_REPORT_ID";
+
+# embedReport(embedToken, workspaceId, reportId);
 
 
-'''
+
+# HTML
+# <!DOCTYPE html>
+# <html lang="en">
+# <head>
+#   <meta charset="UTF-8">
+#   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+#   <title>Embed Power BI Report</title>
+#   <script src="https://cdn.powerbi.com/powerbi-client.js"></script>
+# </head>
+# <body>
+#   <h1>Power BI Report</h1>
+#   <div id="embedContainer"></div>
+
+#   <script>
+#     // Call the embedReport function from your JavaScript file
+#     embedReport('YOUR_EMBED_TOKEN', 'YOUR_WORKSPACE_ID', 'YOUR_REPORT_ID');
+#   </script>
+# </body>
+# </html>
+
+

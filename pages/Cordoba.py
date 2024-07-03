@@ -97,7 +97,7 @@ else:
     # ===============================================================================================================
     # User authorization
     
-    cordoba_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras', 'crodriguez', 'agarcia']
+    cordoba_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras', 'crodriguez', 'agarcia', 'rsaenz']
     if st.session_state['username'] in cordoba_authorized_users:
         st.write(f'Bienvenido a la página de detalle de la propiedad de Córdoba')#, *{st.session_state["name"]}*')
 

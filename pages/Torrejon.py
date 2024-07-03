@@ -102,7 +102,7 @@ else:
     # ===============================================================================================================
     # User authorization
     
-    torrejon_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras', 'crodriguez', 'agarcia']
+    torrejon_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'aheras', 'crodriguez', 'agarcia', 'rsaenz']
     if st.session_state['username'] in torrejon_authorized_users:
         st.write(f'Bienvenido a la página de detalle de la propiedad de Torrejón')#, *{st.session_state["name"]}*')
 

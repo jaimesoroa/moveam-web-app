@@ -10,6 +10,7 @@ COPY services services
 COPY utils.py utils.py
 COPY Home.py Home.py
 COPY database/database_connection.py database/database_connection.py
+COPY database/tuya_connection.py database/tuya_connection.py
 COPY style.css style.css
 # COPY .env .env
 COPY config.yaml config.yaml

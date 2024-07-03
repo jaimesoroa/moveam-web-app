@@ -78,7 +78,7 @@ else:
 # ===============================================================================================================
     # User authorization
     
-    invitado_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'invitado']
+    invitado_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'invitado', 'rsaenz']
     if st.session_state['username'] in invitado_authorized_users:
         st.write(f'Bienvenido a la página de invitados')
         

@@ -30,3 +30,6 @@ prefect
 altair
 boto3
 botocore
+tuya-connector-python
+pymysql
+tenacity

@@ -84,7 +84,7 @@ else:
     # ===============================================================================================================
     # User authorization
     
-    almeria_authorized_users = ['jsoroa', 'fperez', 'jfuster']
+    almeria_authorized_users = ['jsoroa', 'fperez', 'jfuster', 'rsaenz', 'rambla240_1']
     if st.session_state['username'] in almeria_authorized_users:
         st.write(f'Bienvenido a la página de detalle de la propiedad de Almería')
         
@@ -192,14 +192,15 @@ else:
         # Tab Consumos
 
         if tabs == 'Consumos':
-            c1, c2,  = st.columns([15, 1.5], gap='medium')
+            c1, c2,  = st.columns([15, 3], gap='medium')
             with c1:
                 st.title("Consumos de Almería")
             with c2:
-                if st.session_state['logo'] == "moveam":
-                    st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
-                else:
-                    st.image('images/logo-stay-blanco-trans_2.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                st.image('images/rambla240_largo.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                # if st.session_state['logo'] == "moveam":
+                #     st.image('images/Moveam_Transp.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
+                # else:
+                #     st.image('images/logo-stay-blanco-trans_2.png', caption=None, use_column_width=True, clamp=False, channels="RGB", output_format="auto")
             st.markdown("""---""")
 
             tab_cons_1, tab_cons_2, tab_cons_3 = st.tabs(["Dashboard", "General", "Detalle"])
